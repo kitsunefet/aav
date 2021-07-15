@@ -1,4 +1,10 @@
-AAV - Atrox Arena Viewer
+AAV TBC Classic - Atrox Arena Viewer
+
+===
+
+**TBC Classic**
+This is a ressurection of Atrox Arena Viewer to work with TBC Classic. The original addon uses some WoW API that is not available to TBC Classic, the features using the unavailable API have been reworked.
+
 ===
 
 **AAV** is an arena replay addon, that lets you record or even broadcast arena matches. These arena matches can be viewed within WoW, while doing your daily quests, raids or just idling in Dalaran. It's optimized to run in very good-performance.
