@@ -1,7 +1,7 @@
 ﻿
 atroxArenaViewer = LibStub("AceAddon-3.0"):NewAddon("atroxArenaViewer", "AceComm-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceSerializer-3.0")
 
-local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", false)
+local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
 
 local M -- AAV_MatchStub
 local T -- AAV_PlayStub
@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 3
-AAV_VERSIONBUGFIX = 1
+AAV_VERSIONBUGFIX = 2
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -171,7 +171,7 @@ function atroxArenaViewer:OnInitialize()
 		time = 0,
 		move = 0,
 		broadcast = false,
-		record = true,
+		record = false,
 		listening = "",
 		interval = 0.1,
 		update = 0.1,
@@ -181,13 +181,12 @@ function atroxArenaViewer:OnInitialize()
     
     local minimap = AAV_Gui:createMinimapIcon(self)
     
-    print("AAV v"..AAV_VERSIONMAJOR.."."..AAV_VERSIONMINOR.."."..AAV_VERSIONBUGFIX.. " " .. L.AAV_LOADED)
+    print("AAV TBC Classic v"..AAV_VERSIONMAJOR.."."..AAV_VERSIONMINOR.."."..AAV_VERSIONBUGFIX.. " " .. L.AAV_LOADED)
     
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
-    
+    -- Event that could be useful ARENA_TEAM_UPDATE 
 end
-
 
 function atroxArenaViewer:OnEnable()
 
@@ -359,10 +358,14 @@ function atroxArenaViewer:lookupBroadcast(prefix, msg, dist, sender)
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_matchend"] and atroxArenaViewerData.current.listening == sender) then
 	-- MATCH END
-		
-		if (not T) then return end
+		print("Match end")
+		if (not T) then 
+			print("T is nil")
+			return 
+		end
 		T.player:Hide()
 		T:createStats(sd.match, sd.dudes, T:getCurrentBracket())
+		print("Show stats")
 		T.stats:Show()
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_newmatch"] and atroxArenaViewerData.current.listening == sender) then
@@ -386,6 +389,7 @@ function atroxArenaViewer:lookupBroadcast(prefix, msg, dist, sender)
 		AAV_Gui:setPlayerFrameSize(T.origin, T:getCurrentBracket())
 		AAV_Gui:setPlayerFrameSize(T.player, T:getCurrentBracket())
 		
+		print("update player")
 		T:newEntities(T.player) -- redraw
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_updateallplayers"] and atroxArenaViewerData.current.listening == sender and sd.target == UnitName("player")) then
@@ -409,6 +413,7 @@ function atroxArenaViewer:lookupBroadcast(prefix, msg, dist, sender)
 		
 		T:setOnUpdate("start")
 		
+		print("update all player")
 		T:newEntities(T.player) -- redraw
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_spectatorstop"] and atroxArenaViewerData.current.broadcast and sd.target == UnitName("player")) then
@@ -495,7 +500,7 @@ function atroxArenaViewer:handleMatchData(prefix, msg, dist, sender)
 	local message = AAV_Util:split(msg, '^')
 	
 	sender = self:removeServerName(sender)
-	
+
 	if (atroxArenaViewerData.current.listening == sender) then
 		for k,v in pairs(message) do
 			local post = AAV_Util:split("0," .. v, ',')
@@ -563,7 +568,7 @@ function atroxArenaViewer:changeRecording()
 			atroxArenaViewerData.current.record = false
 			print(L.CMD_DISABLE_RECORDING)
 		else
-			print("Aktion in der Arena nicht möglich.")
+			print("Unable to complete this action while in arena.")
 		end
 		--if (atroxArenaViewerData.current.inArena == true) then self:handleEvents("stop") end -- [#18] removed
 	else
@@ -591,9 +596,7 @@ end
 -- status 1 = in queue, in arena: message board; 2 = entered
 function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 
-	print("update battle field status")
-	print(status)
-	
+	print("battlefield status: " .. tostring(status))
 	if (atroxArenaViewerData.current.broadcast or atroxArenaViewerData.current.record and M) then
 		--[[
 		if (atroxArenaViewerData.current.broadcast and status == 1 and currentstate == 2) then
@@ -673,6 +676,7 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			end
 			
 			if (atroxArenaViewerData.current.broadcast) then
+				print("** Match ended **")
 				message["stats"] = {
 					event = AAV_COMM_EVENT["cmd_matchend"],
 					match = M:getTeams(),
@@ -1386,7 +1390,7 @@ function atroxArenaViewer:createPlayer(num)
 	if (atroxArenaViewerData.data[num].bracket == nil) then
 		atroxArenaViewerData.data[num].bracket = 0
 		for k,v in pairs(atroxArenaViewerData.data[num].combatans.dudes) do
-			if (v.player == 1 and v.team == 1) then
+			if (v.player and v.team == 1) then
 				atroxArenaViewerData.data[num].bracket = atroxArenaViewerData.data[num].bracket + 1
 			end
 		end
@@ -1415,9 +1419,9 @@ function atroxArenaViewer:getRecursiveExport(tab, input)
 	for k,v in pairs(tab) do
 		if (not first) then str = str .. "," end
 		if (type(v) == "table") then
-			str = str .. '"' .. k .. '":' .. self:getRecursiveExport(v)
+			str = str .. '"' .. tostring(k) .. '":' .. self:getRecursiveExport(v)
 		else
-			str = str .. '"' .. k .. '":"' .. v .. '"'
+			str = str .. '"' .. tostring(k) .. '":"' .. tostring(v) .. '"'
 		end
 		first = false
 	end
@@ -1427,6 +1431,7 @@ function atroxArenaViewer:getRecursiveExport(tab, input)
 	end
 	
 	str = str .. "}"
+	print(str)
 	return str
 end
 
@@ -1460,7 +1465,7 @@ function atroxArenaViewer:getSkillLegend(tab)
 		local name, _, icon = GetSpellInfo(tonumber(k))
 		icon = string.gsub(string.lower(icon), "interface\\icons\\", "")
 		if (not first) then str = str .. "," end
-		str = str .. '{"id":' .. k .. ',"icon":"' .. icon .. '","name":"' .. name .. '"}'
+		str = str .. '{"id":' .. tostrink .. ',"icon":"' .. icon .. '","name":"' .. name .. '"}'
 		first = false
 	end
 	
@@ -1643,6 +1648,7 @@ function atroxArenaViewer:executeMatchData(tick, data)
 		
 	elseif (t == 16) then
 		-- died
+		-- T:setVisibility(tonumber(data[3]), 4)
 		
 	elseif (t == 17) then
 		-- mana changes

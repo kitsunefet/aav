@@ -10,13 +10,13 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 		return
 	end
 	
-	local o = CreateFrame("Frame", "AAVRoot", UIParent)
+	local o = CreateFrame("Frame", "AAVRoot", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 	o:SetFrameStrata("HIGH")
 	o:SetWidth(650)
 	o:SetPoint("Center", 0, 0)
 	self:setPlayerFrameSize(o, bracket)
 	
-	local f = CreateFrame("Frame", "$parentPlayer", o)
+	local f = CreateFrame("Frame", "$parentPlayer", o, BackdropTemplateMixin and "BackdropTemplate")
 	f:SetFrameStrata("HIGH")
 	f:SetWidth(650)
 	f:SetPoint("TOPLEFT", o, "TOPLEFT", 0, 0)
@@ -36,7 +36,7 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 	o:SetScript("OnMouseUp", o.StopMovingOrSizing)
 	o:Show()
 	
-	local m = CreateFrame("Frame", "$parentMapText", o)
+	local m = CreateFrame("Frame", "$parentMapText", o, BackdropTemplateMixin and "BackdropTemplate")
 	m:SetHeight(30)
 	m:SetPoint("TOP", 0, 18)
 	m:SetBackdrop({
@@ -54,7 +54,7 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 	mt:Show()
 	
 	
-	local l = CreateFrame("STATUSBAR", "$parentLoading", o)
+	local l = CreateFrame("STATUSBAR", "$parentLoading", o, BackdropTemplateMixin and "BackdropTemplate")
 	l:SetWidth(150)
 	l:SetPoint("CENTER", o:GetName(), 0, 0)
 	l:SetStatusBarTexture("Interface\\Addons\\aav\\res\\" .. atroxArenaViewerData.defaults.profile.hpbartexture .. ".tga")
@@ -66,7 +66,7 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 	--m:SetWidth(mt:GetStringWidth() + 25)
 	
 	
-	local btn = CreateFrame("Button", "PlayerCloseButton", o)
+	local btn = CreateFrame("Button", "PlayerCloseButton", o, BackdropTemplateMixin and "BackdropTemplate")
 	btn:SetHeight(32)
 	btn:SetWidth(32)
 	
@@ -100,6 +100,9 @@ end
 function AAV_Gui:createEntityBar(parent, v, y)
 	local anchor, offx, manauser
 	
+	print("createEntityBar")
+	print("createEntityBar: " .. v.name)
+
 	if (v.team==1) then anchor = "TOPLEFT" else anchor = "TOPRIGHT" end
 	if (v.team==1) then offx = 85 else offx = 355 end
 	
@@ -142,10 +145,11 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	b:SetPoint("TOPLEFT", a:GetName(), 30, 1)
 	b:Show()
 	
-	local bback = b:CreateTexture(nil)
-	bback:SetTexture(0.0, 0.0, 0.0)
+
+	local bback = b:CreateTexture(nil, "BACKGROUND")
 	bback:SetAllPoints(b)
-	b.texture = bback
+	bback:SetColorTexture(0, 0, 0, 1)
+	b.tex = bback
 	
 	-- MANA BAR
 	local m = CreateFrame("STATUSBAR", "$parentManaBar", a)
@@ -162,7 +166,7 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	if (manauser) then m:Show() else m:Hide() end
 	
 	local mback = m:CreateTexture(nil)
-	mback:SetTexture(0.0, 0.0, 0.0)
+	mback:SetColorTexture(0.0, 0.0, 0.0)
 	mback:SetAllPoints(m)
 	m.texture = mback
 	
@@ -362,6 +366,7 @@ end
 
 function AAV_Gui:createStatsFrame(parent)
 	
+	print("createStatsFrame")
 	local stats = CreateFrame("Frame", "$parentStats", parent)
 	stats:SetHeight(parent:GetHeight())
 	stats:SetWidth(parent:GetWidth())
@@ -422,7 +427,7 @@ function AAV_Gui:createDetailTeam(parent, num, bracket)
 end
 
 function AAV_Gui:createButtonDetail(parent)
-	
+	print("createButtonDetail")
 	local detail = CreateFrame("BUTTON", "$parentViewDetail", parent, "UIPanelButtonTemplate")
 	detail:SetPoint("BOTTOMRIGHT", -10, 15)
 	detail:SetWidth(120)
@@ -775,7 +780,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 			info.func       = function() parent:changeRecording() end
 			
 			UIDropDownMenu_AddButton(info, level)
-			
+
 			-- ENABLE BROADCASTING
 			reset(info)
 			info.text       = "Enable broadcasting"
@@ -788,14 +793,14 @@ function AAV_Gui:createMinimapIcon(parent, player)
 			info.checked	= nil
 			
 			-- PLAY MATCH
---[[			reset(info)
+			reset(info)
 			info.text       = "Play match"
 			info.notCheckable = true
 			info.notClickable = false
 			info.hasArrow	= true
 			info.func		= nil
 			
-			UIDropDownMenu_AddButton(info, level)]]--
+			UIDropDownMenu_AddButton(info, level)
 			
 			
 			-- CONNECT
@@ -826,8 +831,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 			info.func		= nil
 			UIDropDownMenu_AddButton(info, level)
 			
+
 			-- EXPORT MATCH
-			--[[
 			reset(info)
 			info.text       = "Export match"
 			info.notCheckable = true
@@ -836,14 +841,14 @@ function AAV_Gui:createMinimapIcon(parent, player)
 			info.func       = nil
 			
 			UIDropDownMenu_AddButton(info, level)
-			--]]
 		end
 		
 		if (level == 2) then
 			
---[[			if (UIDROPDOWNMENU_MENU_VALUE == "Play match") then
+			if (UIDROPDOWNMENU_MENU_VALUE == "Play match") then
 				-- PLAY MATCH
 				
+				--[[
 				if (atroxArenaViewerData.data) then
 					
 					for i=1, math.ceil(#atroxArenaViewerData.data / 20) do
@@ -867,8 +872,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 					
 					UIDropDownMenu_AddButton(info, level)
 				end
+				--]]
 				
-
 				if (atroxArenaViewerData.data) then
 					for k,v in pairs(atroxArenaViewerData.data) do
 						info.text = k .. " - " .. v.map .. " (" .. v.startTime .. ")"
@@ -888,11 +893,13 @@ function AAV_Gui:createMinimapIcon(parent, player)
 					
 					UIDropDownMenu_AddButton(info, level)
 				end
-				--]]
+				
+			end
 				
 				
 			if (UIDROPDOWNMENU_MENU_VALUE == "Delete") then
 				--DELETE
+				--[[
 				reset(info)
 				info.text = "Delete All"
 				info.notCheckable = true
@@ -906,10 +913,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				end
 				
 				UIDropDownMenu_AddButton(info, level)
-					
+				--]]	
 			
-				
-				--[[
 				if (atroxArenaViewerData.data) then
 					for k,v in pairs(atroxArenaViewerData.data) do
 						reset(info)
@@ -941,7 +946,6 @@ function AAV_Gui:createMinimapIcon(parent, player)
 					
 					UIDropDownMenu_AddButton(info, level)
 				end
-				--]]
 				
 			elseif (UIDROPDOWNMENU_MENU_VALUE == "Connect") then
 				-- CONNECT
@@ -1146,7 +1150,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				
 			elseif (UIDROPDOWNMENU_MENU_VALUE == "Export match") then
 				-- PLAY MATCH
-				
+				--[[
 				if (atroxArenaViewerData.data) then
 					
 					for i=1, math.ceil(#atroxArenaViewerData.data / 20) do
@@ -1170,8 +1174,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 					
 					UIDropDownMenu_AddButton(info, level)
 				end
+				--]]
 				
-				--[[
 				if (atroxArenaViewerData.data) then
 					for k,v in pairs(atroxArenaViewerData.data) do
 						reset(info)
@@ -1193,7 +1197,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 					
 					UIDropDownMenu_AddButton(info, level)
 				end
-				--]]
+				
 			end
 		end
 		
@@ -1321,6 +1325,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 	
 	button:SetScript("OnClick", function(button, clickType)
 		if(clickType == "LeftButton") then
+			print(AAV_TableGui:isMatchesFrameShowing())
 			if(AAV_TableGui:isMatchesFrameShowing()) then
 				AAV_TableGui:hideMatchesFrame()
 			else

@@ -64,9 +64,10 @@ function AAV_UsedSkill:setValue(parent, spellid, cast, num, v)
 	if (v) then
 		self.tcolor:Show()
 		self.target:Show()
-		self.tcolor.texture:SetTexture(AAV_Util:getTargetColor(v, false))
+		self.tcolor.texture:SetColorTexture(AAV_Util:getTargetColor(v, false))
 	else
-		self.tcolor:Hide()
+		--self.tcolor:Hide()
+		self.tcolor.texture:SetColorTexture(0,0,0,1)
 		self.target:Hide()
 	end
 	

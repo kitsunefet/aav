@@ -325,7 +325,7 @@ end
 -- sets the match end from the first and the last data.
 -- as of 1.1.7 brackets are verified if they consist of 2, 3 or 5 and not nil.
 function AAV_MatchStub:setMatchEnd()
-	
+	print("setMatchEnd")
 	local max, a, b = table.getn(self.data), 0, 0
 	if (self.data[1] and max) then
 		a = AAV_Util:split(self.data[1], ",")

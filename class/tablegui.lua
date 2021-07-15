@@ -13,23 +13,24 @@ local currentShowType
 ----
 --Initializes the frame that holds the matchesTable. Parameters should be moved to conf.lua or aav.lua?
 function AAV_TableGui:createMatchesFrame()
-	local o = CreateFrame("Frame", "AAVMatches", UIParent)
+	--local o = CreateFrame("Frame", "AAVMatches", UIParent)
+	local o = CreateFrame("Frame", "AAVMatches", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 	o:SetFrameStrata("HIGH")
 	o:SetPoint("Center", 0, 0)
-	
+
 	o:SetBackdrop({
-	  bgFile="Interface\\DialogFrame\\UI-DialogBox-Background",
-	  edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-	  tile=1, tileSize=10, edgeSize=10, 
-	  insets={left=3, right=3, top=3, bottom=3}
-	})
+		bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+		tile=1, tileSize=10, edgeSize=10, 
+		insets={left=3, right=3, top=3, bottom=3}
+	  })
 	o:SetMovable(true)
 	o:EnableMouse(true)
 	o:SetScript("OnMouseDown", function(self, button ) o:StartMoving() end)
 	o:SetScript("OnMouseUp", function(self, button ) o:StopMovingOrSizing() end)
 
 	
-	local m = CreateFrame("Frame", "$parentTitle", o)
+	local m = CreateFrame("Frame", "$parentTitle", o, BackdropTemplateMixin and "BackdropTemplate")
 	m:SetHeight(30)
 	m:SetPoint("TOP", 0, 18)
 	m:SetBackdrop({
@@ -53,7 +54,7 @@ function AAV_TableGui:createMatchesFrame()
 	m:SetWidth(ts:GetStringWidth() + 25)
 		
 	
-	local btn = CreateFrame("Button", "$parentCloseButton", o)
+	local btn = CreateFrame("Button", "$parentCloseButton", o, BackdropTemplateMixin and "BackdropTemplate")
 	btn:SetHeight(32)
 	btn:SetWidth(32)
 	
@@ -78,7 +79,6 @@ function AAV_TableGui:showMatchesFrame()
 		self:generateSpecIconAndRoleTables()
 		matchesTable.frame:SetBackdropColor(0.1,0.1,0.1,0.9);
 		currentShowType = atroxArenaViewerData.current.showBySpec
-
 		local width, height = matchesTable.frame:GetSize()
 		matchesTable.frame:SetPoint("CENTER",0,-15)
 		matchesFrame:SetWidth(width)
@@ -91,6 +91,7 @@ function AAV_TableGui:showMatchesFrame()
 			currentShowType = atroxArenaViewerData.current.showBySpec
 		end			
 	else
+		print("Fill matches table isn't working.")
 		self:fillMatchesTable()
 	end
 	matchesFrame:Show()
@@ -149,7 +150,6 @@ function AAV_TableGui:createMatchesTable()
 			["width"] = 50,		
 		}, -- [7]
 	}; 
-
 	matchesTable = ScrollingTable:CreateST(cols, 20, 22, nil, matchesFrame);
 	matchesTable:RegisterEvents({
 		["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, button, ...)
@@ -228,13 +228,64 @@ end
 function AAV_TableGui:generateSpecIconAndRoleTables()
 	specIconTable = {}
 	specRoleTable = {}
+
+	--[[
 	for a = 1, 300 do
 		local _, spec, _, icon, _, role, class = GetSpecializationInfoByID(a)
-		if(spec and icon and class) then
-			specIconTable[class .. " " .. spec] = "\124T" .. icon .. ":22\124t"
-			specRoleTable[class .. " " .. spec] = role
+		if(spec and icon and className) then
+			specIconTable[className .. " " .. spec] = "\124T" .. icon .. ":22\124t"
+			specRoleTable[className .. " " .. spec] = role
 		end
 	end
+	]]--
+
+	-- TBC Classic is unable to use GetSpecializationInfoByID. So Manually added classes / icons.
+	-- Couldn't work out if "spec" and "role" is requried and how to get.
+
+	local classIconPath = "Interface\\Addons\\aav\\images\\classes\\"
+	local classIcons = {
+		["DRUID"] = classIconPath .. "inv_misc_monsterclaw_04",
+		["HUNTER"] = classIconPath .. "inv_weapon_bow_07",
+		["MAGE"] = classIconPath .. "inv_staff_13",
+		["PALADIN"] = classIconPath .. "inv_hammer_01",
+		["PRIEST"] = classIconPath .. "inv_staff_30",
+		["ROGUE"] = classIconPath .. "inv_throwingknife_04",
+		["SHAMAN"] = classIconPath .. "inv_jewelry_talisman_04",
+		["WARLOCK"] = classIconPath .. "spell_nature_drowsy",
+		["WARRIOR"] = classIconPath .. "inv_sword_27",
+	}
+
+	local classNames = {
+		["DRUID"] = C_CreatureInfo.GetClassInfo(11).className,
+		["HUNTER"] = C_CreatureInfo.GetClassInfo(3).className,
+		["MAGE"] = C_CreatureInfo.GetClassInfo(8).className,
+		["PALADIN"] = C_CreatureInfo.GetClassInfo(2).className,
+		["PRIEST"] = C_CreatureInfo.GetClassInfo(5).className,
+		["ROGUE"] = C_CreatureInfo.GetClassInfo(4).className,
+		["SHAMAN"] = C_CreatureInfo.GetClassInfo(7).className,
+		["WARLOCK"] = C_CreatureInfo.GetClassInfo(9).className,
+		["WARRIOR"] = C_CreatureInfo.GetClassInfo(1).className,
+	}
+
+	specIconTable[classNames["DRUID"] .. " " .. "spec"] = "\124T" .. classIcons["DRUID"] .. ":22\124t"
+	specRoleTable[classNames["DRUID"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["HUNTER"] .. " " .. "spec"] = "\124T" .. classIcons["HUNTER"] .. ":22\124t"
+	specRoleTable[classNames["HUNTER"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["MAGE"] .. " " .. "spec"] = "\124T" .. classIcons["MAGE"] .. ":22\124t"
+	specRoleTable[classNames["MAGE"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["PALADIN"] .. " " .. "spec"] = "\124T" .. classIcons["PALADIN"] .. ":22\124t"
+	specRoleTable[classNames["PALADIN"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["PRIEST"] .. " " .. "spec"] = "\124T" .. classIcons["PRIEST"] .. ":22\124t"
+	specRoleTable[classNames["PRIEST"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["ROGUE"] .. " " .. "spec"] = "\124T" .. classIcons["ROGUE"] .. ":22\124t"
+	specRoleTable[classNames["ROGUE"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["SHAMAN"] .. " " .. "spec"] = "\124T" .. classIcons["SHAMAN"] .. ":22\124t"
+	specRoleTable[classNames["SHAMAN"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["WARLOCK"] .. " " .. "spec"] = "\124T" .. classIcons["WARLOCK"] .. ":22\124t"
+	specRoleTable[classNames["WARLOCK"]  .. " " .. "spec"] = "role"
+	specIconTable[classNames["WARRIOR"] .. " " .. "spec"] = "\124T" .. classIcons["WARRIOR"] .. ":22\124t"
+	specRoleTable[classNames["WARRIOR"]  .. " " .. "spec"] = "role"
+
 end
 
 ----

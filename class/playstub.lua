@@ -230,6 +230,8 @@ function AAV_PlayStub:newEntities(f)
 	local b, c, cr, n, s, txt
 	local dir = {[1]=0, [2]=0}
 	
+	print("new entities")
+
 	for k,v in pairs(self:getDudesData()) do
 		if (v.player) then -- only players
 			
@@ -302,11 +304,13 @@ function AAV_PlayStub:setVisibility(id, type)
 	if (not self.entities[id]) then return end
 	
 	if (type == 1) then
-		self.entities[id]:setOpacity(0.5)
+		self.entities[id]:setOpacity(0.6)
 	elseif (type == 2) then
 		self.entities[id]:setOpacity(1)
 	elseif (type == 3) then
-		--
+		self.entities[id]:setOpacity(0.1)
+	elseif (type == 4) then
+		self.entities[id]:setOpacity(0.3)
 	end
 end
 
@@ -735,7 +739,7 @@ function AAV_PlayStub:getCurrentBracket()
 	local bracket = 0
 	if (self.data and self.data.combatans and self.data.combatans.dudes) then
 		for k,v in pairs(self.data.combatans.dudes) do
-			if (v.player == 1 and v.team == 1) then
+			if (v.player and v.team == 1) then
 				bracket = bracket + 1
 			end
 		end
@@ -855,6 +859,7 @@ function AAV_PlayStub:handleIndexCreation(val)
 end
 
 function AAV_PlayStub:createStats(teamdata, matchdata, bracket)
+	print("createStats")
 	local num = 1
 	if (#self.pool.stats == 0) then -- if empty
 		for k,v in pairs(teamdata) do		
