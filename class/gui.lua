@@ -1325,7 +1325,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 	
 	button:SetScript("OnClick", function(button, clickType)
 		if(clickType == "LeftButton") then
-			print(AAV_TableGui:isMatchesFrameShowing())
+			--print(AAV_TableGui:isMatchesFrameShowing())
 			if(AAV_TableGui:isMatchesFrameShowing()) then
 				AAV_TableGui:hideMatchesFrame()
 			else

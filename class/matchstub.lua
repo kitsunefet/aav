@@ -265,7 +265,17 @@ function AAV_MatchStub:setPlayer(guids, name, rating, damageDone, healingDone, p
 	else
 		guid = self:getNametoGUID(name) --enemey guid is still present even if they already left
 	end
-				
+	
+	print("--- debug setPlayer in matchstub ---")
+	print(guid) --TODO: gives nil, check why. maybe because name is not name, but rather specName.
+	print(guids)
+	print(name)
+	print(rating)
+	print(damageDone)
+	print(healingDone)
+	print(personalRatingChange)
+	print(mmr)
+	print(spec)
 	self.combatans.dudes[guid].rating = rating -- atm no api to get others rating
 	self.combatans.dudes[guid].ddone = damageDone
 	self.combatans.dudes[guid].hdone = healingDone
@@ -278,10 +288,11 @@ end
 -- finds the spec of the arenaOpponent 1-5, corresponding to unit arena1 - arena5
 -- @param guid
 -- @param opponentNumber
+-- TBC Classic: removed, spec cannot be obtained via API. could only guess by presence of certain spec specific buffs like Gladdy does, but will not implement this here for now.
 function AAV_MatchStub:SetOpponentSpec(guid, opponentNumber)
 	if(self.combatans.dudes[guid].spec == nil or strlen(self.combatans.dudes[guid].spec) == 0) then
-		local specID = GetArenaOpponentSpec(opponentNumber)
-		local _, specName = GetSpecializationInfoByID(specID)
+		local specID = 0 --GetArenaOpponentSpec(opponentNumber)
+		local _, specName = "nospec" --GetSpecializationInfoByID(specID)
 		if(specName) then 
 			--print("[debug] From M:SetOpponentSpec Update: " .. opponentNumber .. " spec set to " .. specName)
 			self.combatans.dudes[guid].spec = specName
@@ -325,7 +336,7 @@ end
 -- sets the match end from the first and the last data.
 -- as of 1.1.7 brackets are verified if they consist of 2, 3 or 5 and not nil.
 function AAV_MatchStub:setMatchEnd()
-	print("setMatchEnd")
+	--print("setMatchEnd")
 	local max, a, b = table.getn(self.data), 0, 0
 	if (self.data[1] and max) then
 		a = AAV_Util:split(self.data[1], ",")

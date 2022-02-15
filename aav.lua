@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 3
-AAV_VERSIONBUGFIX = 2
+AAV_VERSIONBUGFIX = 3
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -156,7 +156,7 @@ function atroxArenaViewer:OnInitialize()
 				minimapy = 58.8,
 				hpbartexture = "oCB",
 				manabartexture = "oCB",
-				broadcastannounce = true, --broadcast announce
+				broadcastannounce = false, --broadcast announce
 				healthdisplay = 3, -- deficit percentage
 				shortauras = true, -- don't exceed debuff buff bar
 				uniquecolor = false, -- use class color as hp bar
@@ -596,7 +596,7 @@ end
 -- status 1 = in queue, in arena: message board; 2 = entered
 function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 
-	print("battlefield status: " .. tostring(status))
+	--print("battlefield status: " .. tostring(status))
 	if (atroxArenaViewerData.current.broadcast or atroxArenaViewerData.current.record and M) then
 		--[[
 		if (atroxArenaViewerData.current.broadcast and status == 1 and currentstate == 2) then
@@ -646,18 +646,30 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			local rating = 0
 			
 			for j=1, arenaPlayers do
-				local name, killingBlows, _, _, _, faction, _, _, classToken, damageDone, healingDone, personalRating, personalRatingChange, _, _, specName = GetBattlefieldScore(j); -- http://wowprogramming.com/docs/api/GetBattlefieldScore
-				name = self:removeServerName(name)
+				--local name, killingBlows, _, _, _, faction, _, _, classToken, damageDone, healingDone, personalRating, personalRatingChange, _, _, specName = GetBattlefieldScore(j); -- http://wowprogramming.com/docs/api/GetBattlefieldScore
+				local name, killingBlows, _, _, _, faction, _, _, classToken, damageDone, healingDone, personalRating, personalRatingChange, _, _, specName; -- http://wowprogramming.com/docs/api/GetBattlefieldScore
+				--name = self:removeServerName(name) -- TODO: check why nil
+				if(name == nil) then
+					name = "player" .. j -- dirty fix
+				else
+					name = self:removeServerName(name) -- TODO: check if this is working
+					-- name = name --TODO: alternative dirty fix
+				end
+				
+
 				if (name == playerName) then -- we can only know the rating of the streamer
 					local groupNum = max(GetNumGroupMembers())
 					if(M and bracketIndex[M.bracket]) then 
-						rating = GetPersonalRatedInfo(bracketIndex[M.bracket])
+						--rating = GetPersonalRatedInfo(bracketIndex[M.bracket])
+						rating = "999"
 					elseif (bracketIndex[groupNum]) then -- Called if M gives a bad value, the preferred method in gladius
-						rating = GetPersonalRatedInfo(bracketIndex[groupNum])
+						--rating = GetPersonalRatedInfo(bracketIndex[groupNum])
+						rating = "1000"
 					else
 						local mpla = ceil(arenaPlayers/2)
 						if(bracketIndex[mpla]) then -- Not enough people joined on either team, one more attempt to guess the bracket
-							rating = GetPersonalRatedInfo(bracketIndex[mpla])
+							--rating = GetPersonalRatedInfo(bracketIndex[mpla])
+							rating = "1001"
 						else
 							rating = "0"
 						end
@@ -665,10 +677,33 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 				else
 					rating = "0"
 				end						
-					
+				
+				-- TODO: does not work in skirms (mmr = 0), need to check for rated games
 				if (faction == 0) then mmr = greenBeforeMMR	else mmr = goldBeforeMMR end		
-
-				M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
+				print("--- debug setPlayer in aav ---")
+				-- TODO: why is this all messed up with nil values and wrong order?
+				print(guids) -- gives a table
+				print("name: " .. name) -- gives the spec (= "nospec")
+				print("rating: " .. rating) -- gives 0 (at least in skirms)
+				--print("dmg done: " .. damageDone) -- TODO: get actual value, gives nil
+				--print("healing done: " .. healingDone) -- TODO: get actual value, gives nil
+				if(personalRatingChange) then
+					print("perso rating change: " .. personalRatingChange) -- TODO: get actual value, gives nil
+				else
+					print("perso rating nil")
+				end
+				if(mmr) then
+					print("mmr: " .. mmr) -- TODO: check value
+				else
+					print("mmr nil")
+				end
+				if(specName) then
+					print("specName: " .. specName) --TODO: check value
+				else
+					print("specName nil")
+				end
+				--M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
+				M:setPlayer(guids,name, rating, 0, 0, 0, mmr, "nospec")
 			end
 			
 			for i=0,1 do			
@@ -808,14 +843,15 @@ end
 -- @param event
 -- @param guid Guid used to find who to inspect
 -- @param other
+-- TBC Classic: removed, spec cannot be obtained via API. could only guess by presence of certain spec specific buffs like Gladdy does, but will not implement this here for now.
 function atroxArenaViewer:INSPECT_READY(event, guid, other)
 	if(M and M:getDudesData()[guid]) then
 		for i = 1, 5 do
 			if (UnitExists("raid" .. i)) then
 				if(guid == UnitGUID("raid" .. i)) then --should only happen once
 					if(M:getDudesData()[guid].spec == nil or strlen(M:getDudesData()[guid].spec) == 0) then
-						local specID = GetInspectSpecialization("raid" .. i)
-						local _, specName = GetSpecializationInfoByID(specID)
+						local specID = 0 --GetInspectSpecialization("raid" .. i)
+						local _, specName = "nospec" --GetSpecializationInfoByID(specID)
 						if(specName) then 
 							M.combatans.dudes[guid].spec = specName
 						end
@@ -1118,10 +1154,11 @@ function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
 		if (not M) then return end
 		local sourceGUID = UnitGUID(unit)
 		
-		print("========")
-		print(sourceGUID)
-		print(unit)
-		print(M:getDudesData())
+		-- debugging prints
+		--print("========")
+		--print(sourceGUID)
+		--print(unit)
+		--print(M:getDudesData())
 		M:getDudesData()[sourceGUID].name = UnitName(unit)
 		self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
 		

@@ -1,6 +1,6 @@
 ## Title: AAV - atrox Arena Viewer
 ## Author: zwacky
-## Interface: 80000
+## Interface: 20503
 ## SavedVariables: atroxArenaViewerData
 ## Notes: record and view arena replays.
 

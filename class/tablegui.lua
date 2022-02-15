@@ -91,7 +91,7 @@ function AAV_TableGui:showMatchesFrame()
 			currentShowType = atroxArenaViewerData.current.showBySpec
 		end			
 	else
-		print("Fill matches table isn't working.")
+		--print("Fill matches table isn't working.") -- really not working? maybe fixed :)
 		self:fillMatchesTable()
 	end
 	matchesFrame:Show()
@@ -194,7 +194,12 @@ function AAV_TableGui:fillMatchesTable()
 			data[row].cols[3] = { ["value"] = AAV_COMM_MAPS[atroxArenaViewerData.data[row]["map"]] };
 
 			-- match up against
-			data[row].cols[4] = { ["value"] = "vs       " .. atroxArenaViewerData.data[row].teams[1].name };
+			-- fix: no team name for skirms
+			if (atroxArenaViewerData.data[row].teams[1].name) then
+				data[row].cols[4] = { ["value"] = "vs       " .. atroxArenaViewerData.data[row].teams[1].name };
+			else
+				data[row].cols[4] = { ["value"] = "vs       skirmish"};
+			end
 
 			-- win or loss
 			data[row].cols[5] = { ["value"] = atroxArenaViewerData.data[row]["result"] == 0 and "LOSS" or "WIN" };
