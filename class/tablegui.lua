@@ -91,7 +91,6 @@ function AAV_TableGui:showMatchesFrame()
 			currentShowType = atroxArenaViewerData.current.showBySpec
 		end			
 	else
-		--print("Fill matches table isn't working.") -- really not working? maybe fixed :)
 		self:fillMatchesTable()
 	end
 	matchesFrame:Show()
@@ -134,19 +133,19 @@ function AAV_TableGui:createMatchesTable()
 			["width"] = 125,
 		}, -- [3]
 		{
-			["name"] = " ",
-			["width"] = 285,		
+			["name"] = "         Enemy Team",
+			["width"] = 275,		
 		}, -- [4]
 		{
 			["name"] = "Result",
-			["width"] = 50,		
+			["width"] = 70,		
 		}, -- [5]
 		{
 			["name"] = "Rating",
-			["width"] = 100,		
+			["width"] = 80,		
 		}, -- [6]
 		{
-			["name"] = " ",
+			["name"] = "Delete",
 			["width"] = 50,		
 		}, -- [7]
 	}; 
@@ -175,7 +174,8 @@ function AAV_TableGui:fillMatchesTable()
 	local data = {}
 	if(atroxArenaViewerData.data and atroxArenaViewerData.data[1]) then
 		local deleteColor  = { ["r"] = 1.0, ["g"] = 0.0, ["b"] = 0.0, ["a"] = 1.0 };
-		local wonMatchColor = { ["r"] = 0.00, ["g"] = 1.0, ["b"] = 0.00, ["a"] = 1.0 };
+		local unknownMatchColor = { ["r"] = 1.0, ["g"] = 0.00, ["b"] = 0.00, ["a"] = 1.0 };
+		local wonMatchColor = { ["r"] = 0.00, ["g"] = 1.00, ["b"] = 0.00, ["a"] = 1.0 };
 		local lostMatchColor = { ["r"] = 1.0, ["g"] = 0.00, ["b"] = 0.00, ["a"] = 1.0 };
 		for row = 1, #atroxArenaViewerData.data do
 			if not data[row] then
@@ -194,34 +194,43 @@ function AAV_TableGui:fillMatchesTable()
 			data[row].cols[3] = { ["value"] = AAV_COMM_MAPS[atroxArenaViewerData.data[row]["map"]] };
 
 			-- match up against
-			-- fix: no team name for skirms
 			if (atroxArenaViewerData.data[row].teams[1].name) then
 				data[row].cols[4] = { ["value"] = "vs       " .. atroxArenaViewerData.data[row].teams[1].name };
 			else
-				data[row].cols[4] = { ["value"] = "vs       skirmish"};
+				data[row].cols[4] = { ["value"] = "vs       unknown teamname"};
 			end
 
 			-- win or loss
-			data[row].cols[5] = { ["value"] = atroxArenaViewerData.data[row]["result"] == 0 and "LOSS" or "WIN" };
+			if atroxArenaViewerData.data[row]["result"] == 0 then
+				data[row].cols[5] = { ["value"] = "UNKNOWN" };
+				data[row].cols[5].color = unknownMatchColor
+				--print("unknownMatchColor") -- debug
+			elseif atroxArenaViewerData.data[row]["result"] == 1 then
+				data[row].cols[5] = { ["value"] = "WIN" };
+				data[row].cols[5].color = wonMatchColor
+				--print("wonMatchColor") -- debug 
+			elseif atroxArenaViewerData.data[row]["result"] == 2 then
+				data[row].cols[5] = { ["value"] = "LOSS" };
+				data[row].cols[5].color = lostMatchColor
+				--print("lostMatchColor") -- debug
+			else
+				data[row].cols[5] = { ["value"] = atroxArenaViewerData.data[row]["result"] };
+				data[row].cols[5].color = unknownMatchColor
+				--print("unknownMatchColor no valid result") -- debug
+			end
 
 			-- rating
 			data[row].cols[6] = { ["value"] = atroxArenaViewerData.data[row]["teams"][1]["rating"] };
 
 			-- delete
 			data[row].cols[7] = { ["value"] = "DELETE" };
-
-			if (atroxArenaViewerData.data[row]["result"] == 1) then
-				data[row].cols[5].color = wonMatchColor
-			elseif (atroxArenaViewerData.data[row]["result"] == 0) then
-				data[row].cols[5].color = lostMatchColor
-			end
 			data[row].cols[7].color = deleteColor
 		end
 	else
 		data[1] = {};
 		data[1].cols = {};
 		for i = 1, 7 do
-			data[1].cols[i] = { ["value"] = "None" };
+			data[1].cols[i] = { ["value"] = "None" }; -- fallback, should not happen...
 		end
 	end
 	matchesTable:SetData(data);

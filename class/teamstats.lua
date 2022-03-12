@@ -2,10 +2,10 @@
 AAV_TeamStats.__index = AAV_TeamStats
 
 function AAV_TeamStats:new(parent, teamdata, matchdata, team, bracket)
-	
+
 	local self = {}
 	setmetatable(self, AAV_TeamStats)
-	
+
 	self.posY = ((team-1) * bracket * (25))
 	self.teamhead = AAV_Gui:createTeamHead(parent, self.posY, team)
 	self.entries = {}
@@ -46,17 +46,31 @@ function AAV_TeamStats:setValue(parent, teamdata, matchdata, team, bracket)
 	self:hideAll()
 	
 	self.teamhead:SetText(teamdata.name)
-	
+
 	local rating, mmr, diff
 	local i = 1
 	local j = 1
 	
-	
 	for c,w in pairs(matchdata) do
-		if (w.player == 1 and w.team == team) then
-			if (w.ratingChange and w.ratingChange >= 0) then diff = "+" .. w.ratingChange else diff = w.ratingChange end
-			if (not w.rating) then rating = "? (" .. diff .. ")" else rating = w.rating .. " (" .. diff .. ")" end
-			if (not w.mmr) then mmr = "-" else mmr = w.mmr end
+		if (w.player == true and w.team == team) then
+			if (w.ratingChange and w.ratingChange >= 0) then 
+				diff = "+" .. w.ratingChange 
+			else 
+				diff = w.ratingChange 
+			end
+
+			if (not w.rating) then
+				rating = "? (" .. diff .. ")" 
+			else 
+				rating = w.rating .. " (" .. diff .. ")" 
+			end
+
+			if (not w.mmr) then 
+				mmr = "-" 
+			else 
+				mmr = w.mmr 
+			end
+			
 			local higestDamage = w.hcrit .."\n" .. self:trunkHCritSpellName(w.hCritName)
 			
 			self.entries[i]["entry"]:Show()

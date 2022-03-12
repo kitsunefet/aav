@@ -35,6 +35,18 @@ function AAV_MatchStub:new()
 	return self
 end
 
+
+function AAV_MatchStub:setResult(winnerteamid)
+	local winnerid = winnerteamid
+	-- print("set result to winnerid: " .. winnerid) -- debug
+	self.result = winnerid
+	-- print("result: " .. self.result) -- debug
+end
+----
+-- saves temporary data to variables.
+-- as of 1.1.7 buffs and debuffs arent saved to variables anymore.
+-- @param mid matchid
+
 ----
 -- saves temporary data to variables.
 -- as of 1.1.7 buffs and debuffs arent saved to variables anymore.
@@ -259,23 +271,23 @@ end
 -- @param personalRatingChange
 -- @param mmr
 -- @param spec
-function AAV_MatchStub:setPlayer(guids, name, rating, damageDone, healingDone, personalRatingChange, mmr, spec)
-	if( self:getNametoGUID(name) == nil ) then  --someone of your party already left
-		guid = guids[name]
+function AAV_MatchStub:setPlayer(guids, playerName, rating, damageDone, healingDone, personalRatingChange, mmr, spec)
+	if( self:getNametoGUID(playerName) == nil ) then  --someone of your party already left
+		guid = guids[playerName]
 	else
-		guid = self:getNametoGUID(name) --enemey guid is still present even if they already left
+		guid = self:getNametoGUID(playerName) --enemey guid is still present even if they already left
 	end
 	
-	print("--- debug setPlayer in matchstub ---")
-	print(guid) --TODO: gives nil, check why. maybe because name is not name, but rather specName.
-	print(guids)
-	print(name)
-	print(rating)
-	print(damageDone)
-	print(healingDone)
-	print(personalRatingChange)
-	print(mmr)
-	print(spec)
+	-- print("--- debug setPlayer in matchstub ---")
+	-- print(guid) --TODO: gives nil, check why. maybe because name is not name, but rather specName.
+	-- print(guids)
+	-- print(playerName)
+	-- print(rating)
+	-- print(damageDone)
+	-- print(healingDone)
+	-- print(personalRatingChange)
+	-- print(mmr)
+	-- print(spec)
 	self.combatans.dudes[guid].rating = rating -- atm no api to get others rating
 	self.combatans.dudes[guid].ddone = damageDone
 	self.combatans.dudes[guid].hdone = healingDone
@@ -288,11 +300,11 @@ end
 -- finds the spec of the arenaOpponent 1-5, corresponding to unit arena1 - arena5
 -- @param guid
 -- @param opponentNumber
--- TBC Classic: removed, spec cannot be obtained via API. could only guess by presence of certain spec specific buffs like Gladdy does, but will not implement this here for now.
+-- TBC Classic: set to static value nospec, spec cannot be obtained via API. could only guess by presence of certain spec specific buffs like Gladdy does, but will not implement this here for now.
 function AAV_MatchStub:SetOpponentSpec(guid, opponentNumber)
 	if(self.combatans.dudes[guid].spec == nil or strlen(self.combatans.dudes[guid].spec) == 0) then
 		local specID = 0 --GetArenaOpponentSpec(opponentNumber)
-		local _, specName = "nospec" --GetSpecializationInfoByID(specID)
+		local _, specName = "", "nospec" --GetSpecializationInfoByID(specID)
 		if(specName) then 
 			--print("[debug] From M:SetOpponentSpec Update: " .. opponentNumber .. " spec set to " .. specName)
 			self.combatans.dudes[guid].spec = specName

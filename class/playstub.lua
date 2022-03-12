@@ -230,7 +230,7 @@ function AAV_PlayStub:newEntities(f)
 	local b, c, cr, n, s, txt
 	local dir = {[1]=0, [2]=0}
 	
-	print("new entities")
+	--print("new entities")
 
 	for k,v in pairs(self:getDudesData()) do
 		if (v.player) then -- only players
@@ -642,8 +642,8 @@ end
 -- @param dest target id
 -- @param spellid skill that interrupted
 -- @param interrupted the interrupted spell id
+-- TODO: not working in TBC classic, because casts are currently not showing a cast time/bar, so isCasting evaluates to false
 function AAV_PlayStub:interruptSkill(source, dest, spellid, interrupted)
-	
 	if (not self.entities[dest]) then return end
 	
 	local target, rupt = nil, nil
@@ -651,12 +651,16 @@ function AAV_PlayStub:interruptSkill(source, dest, spellid, interrupted)
 	-- check if destination is actually casting a spell
 	for k,v in pairs(self.entities[dest].skills) do
 		if (v:isCasting()) then
+			-- print("target is casting") -- debug
 			target = v
 			target.cast = false
 			break
 		end
 	end
-	if (not target) then return end
+	if (not target) then
+		-- print("target nil") -- debug
+		return
+	end
 	
 	-- reuse X texture on skill
 	for k,v in pairs(self.interrupts) do
@@ -859,7 +863,7 @@ function AAV_PlayStub:handleIndexCreation(val)
 end
 
 function AAV_PlayStub:createStats(teamdata, matchdata, bracket)
-	print("createStats")
+	-- print("createStats") -- debug
 	local num = 1
 	if (#self.pool.stats == 0) then -- if empty
 		for k,v in pairs(teamdata) do		

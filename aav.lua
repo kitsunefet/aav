@@ -171,7 +171,7 @@ function atroxArenaViewer:OnInitialize()
 		time = 0,
 		move = 0,
 		broadcast = false,
-		record = false,
+		record = true,
 		listening = "",
 		interval = 0.1,
 		update = 0.1,
@@ -232,7 +232,7 @@ end
 -- @return a player name without servername in it
 function atroxArenaViewer:removeServerName(name)
 	local nameReturned = name
-	
+
 	for nome,server in string.gmatch(name, "(%S+)-(%S+)") do
 		nameReturned = nome
 	end
@@ -358,20 +358,23 @@ function atroxArenaViewer:lookupBroadcast(prefix, msg, dist, sender)
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_matchend"] and atroxArenaViewerData.current.listening == sender) then
 	-- MATCH END
-		print("Match end")
+		--print("Match end")
 		if (not T) then 
-			print("T is nil")
+			--print("T is nil")
 			return 
 		end
 		T.player:Hide()
 		T:createStats(sd.match, sd.dudes, T:getCurrentBracket())
-		print("Show stats")
+		--print("Show stats")
 		T.stats:Show()
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_newmatch"] and atroxArenaViewerData.current.listening == sender) then
 	-- NEW MATCH
 		
-		if (not T) then print("error") return end -- should never happen cough
+		if (not T) then 
+			--print("error")
+			return
+		end -- should never happen cough
 		
 		T:hidePlayer(T.player)
 		T:resetDudeData()
@@ -389,13 +392,16 @@ function atroxArenaViewer:lookupBroadcast(prefix, msg, dist, sender)
 		AAV_Gui:setPlayerFrameSize(T.origin, T:getCurrentBracket())
 		AAV_Gui:setPlayerFrameSize(T.player, T:getCurrentBracket())
 		
-		print("update player")
+		--print("update player")
 		T:newEntities(T.player) -- redraw
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_updateallplayers"] and atroxArenaViewerData.current.listening == sender and sd.target == UnitName("player")) then
 	-- UPDATE ALL PLAYERS
 	
-		if (not T) then print("Error: PlayerStub not initialized.") return end -- should never happen cough
+		if (not T) then 
+			--print("Error: PlayerStub not initialized.") 
+			return 
+		end -- should never happen cough
 		
 		T:hidePlayer(T.player)
 		T:resetDudeData()
@@ -413,7 +419,7 @@ function atroxArenaViewer:lookupBroadcast(prefix, msg, dist, sender)
 		
 		T:setOnUpdate("start")
 		
-		print("update all player")
+		--print("update all player")
 		T:newEntities(T.player) -- redraw
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_spectatorstop"] and atroxArenaViewerData.current.broadcast and sd.target == UnitName("player")) then
@@ -461,7 +467,7 @@ function atroxArenaViewer:handleBroadcasting(val)
 	}
 	
 	if (val == "start") then
-		print(L.CMD_ENABLE_BROADCAST)
+		print("|cffe392c5<AAV>|r " .. L.CMD_ENABLE_BROADCAST)
 		atroxArenaViewerData.current.broadcast = true
 		for k,v in pairs(spectators) do spectators[k] = nil end
 		
@@ -469,7 +475,7 @@ function atroxArenaViewer:handleBroadcasting(val)
 			self:handleQueueTimer("start")
 		end
 	elseif (val == "stop") then
-		print(L.CMD_DISABLE_BROADCAST)
+		print("|cffe392c5<AAV>|r " .. L.CMD_DISABLE_BROADCAST)
 		atroxArenaViewerData.current.broadcast = false
 		
 		-- broadcasting that you're broadcasting
@@ -566,15 +572,15 @@ function atroxArenaViewer:changeRecording()
 	if (atroxArenaViewerData.current.record == true) then
 		if (atroxArenaViewerData.current.inArena == false) then
 			atroxArenaViewerData.current.record = false
-			print(L.CMD_DISABLE_RECORDING)
+			print("|cffe392c5<AAV>|r " .. L.CMD_DISABLE_RECORDING)
 		else
-			print("Unable to complete this action while in arena.")
+			print("|cffe392c5<AAV>|r Unable to complete this action while in arena.")
 		end
 		--if (atroxArenaViewerData.current.inArena == true) then self:handleEvents("stop") end -- [#18] removed
 	else
 		atroxArenaViewerData.current.record = true
 		--if (atroxArenaViewerData.current.inArena == true) then self:handleEvents("start") end -- [#18] removed
-		print(L.CMD_ENABLE_RECORDING)
+		print("|cffe392c5<AAV>|r " .. L.CMD_ENABLE_RECORDING)
 	end
 end
 
@@ -596,7 +602,7 @@ end
 -- status 1 = in queue, in arena: message board; 2 = entered
 function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 
-	--print("battlefield status: " .. tostring(status))
+	print("battlefield status: " .. tostring(status))
 	if (atroxArenaViewerData.current.broadcast or atroxArenaViewerData.current.record and M) then
 		--[[
 		if (atroxArenaViewerData.current.broadcast and status == 1 and currentstate == 2) then
@@ -635,83 +641,165 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 		elseif (status == 1 and atroxArenaViewerData.current.inArena) then
 		
 			local arenaPlayers = GetNumBattlefieldScores()  -- Number of participant scores available in the current battleground; 0 if not in a battleground (number)
-			local playerName = GetUnitName("player")
-			local _, _, _, greenBeforeMMR = GetBattlefieldTeamInfo(0)
-			local _, _, _, goldBeforeMMR = GetBattlefieldTeamInfo(1)
+			local playerName = GetUnitName("player", false)
+			-- local _, _, _, greenBeforeMMR = GetBattlefieldTeamInfo(0)
+			-- local _, _, _, goldBeforeMMR = GetBattlefieldTeamInfo(1)
+			local IsActiveBattlefieldArena,GetBattlefieldWinner,GetBattlefieldTeamInfo
+				= IsActiveBattlefieldArena,GetBattlefieldWinner,GetBattlefieldTeamInfo
+			local n = 1 --Chatframe#
+			local teamName0, oldTeamRating0, newTeamRating0, matchMakingRating0 = GetBattlefieldTeamInfo(0) -- Purple Team = 0
+			local teamName1, oldTeamRating1, newTeamRating1, matchMakingRating1 = GetBattlefieldTeamInfo(1) -- Gold Team = 1
+			local diff0 = newTeamRating0 - oldTeamRating0
+			local diff1 = newTeamRating1 - oldTeamRating1
+			local playerTeamColor = 'nocolor'
+			local isUnratedArena, isRatedArena = IsActiveBattlefieldArena() 
+			local battlefieldWinnerTeam = GetBattlefieldWinner() -- 0 = purple team, 1 = gold team
+			
+			if (battlefieldWinnerTeam == nil) then
+				print("no winner") -- debug message
+				return -- should not happen..
+			else
+				print("winner team: " .. battlefieldWinnerTeam) -- debug message
+			end
+
+			if (isRatedArena) then
+				print("rated arena match")
+				
+				print("--- team 0 ---")
+				print(teamName0) -- debug message
+				print(oldTeamRating0) -- debug message
+				print(diff0) -- debug message
+				print(matchMakingRating0) -- debug message
+				-- team (id), name (team), rating, diff, mmr
+				M:setTeams(0, teamName0, oldTeamRating0, diff0, matchMakingRating0)  --test0
+				
+				print("--- team 1 ---")
+				print(teamName1) -- debug message
+				print(oldTeamRating1) -- debug message
+				print(diff1) -- debug message
+				print(matchMakingRating1) -- debug message
+				-- team (id), name (team), rating, diff, mmr
+				M:setTeams(1, teamName1, oldTeamRating1, diff1, matchMakingRating1)  --test1
+	
+				local ChatFrame = _G["ChatFrame"..n]
+				ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team
+				ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team
+			end
+
+			if (isUnratedArena) then
+				print("unrated arena match") -- debug message
+				
+				-- team (id), name (team), rating, diff, mmr
+				M:setTeams(0, "skirmish",  "0 (skirm)",  "0 (skirm)",  "0 (skirm)")
+				teamName0 = "skirmteam0"
+				
+								-- team (id), name (team), rating, diff, mmr
+				M:setTeams(1, "skirmish",  "0 (skirm)",  "0 (skirm)",  "0 (skirm)")
+				teamName1 = "skirmteam1"
+
+				local ChatFrame = _G["ChatFrame"..n]
+				ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team
+				ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team
+			end
+
 			local bracketIndex = {}
 			bracketIndex[2] = 1
 			bracketIndex[3] = 2
 			bracketIndex[5] = 3
 			local mmr = 0
-			local rating = 0
+			local rating = "0"
+			local ratingDiff = 0
 			
 			for j=1, arenaPlayers do
-				--local name, killingBlows, _, _, _, faction, _, _, classToken, damageDone, healingDone, personalRating, personalRatingChange, _, _, specName = GetBattlefieldScore(j); -- http://wowprogramming.com/docs/api/GetBattlefieldScore
-				local name, killingBlows, _, _, _, faction, _, _, classToken, damageDone, healingDone, personalRating, personalRatingChange, _, _, specName; -- http://wowprogramming.com/docs/api/GetBattlefieldScore
-				--name = self:removeServerName(name) -- TODO: check why nil
+				local name, killingBlows, honorableKills, deaths, honorGained, faction, _, race, class, classToken, damageDone, healingDone, _, _, _, _, _ = GetBattlefieldScore(j);
+   				-- original: local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange, preMatchMMR, mmrChange, talentSpec = GetBattlefieldScore(index)
+			    -- no some fields are always 0, no idea what that field between faction and race represents
+				-- bgRating, ratingChange, preMatchMMR, mmrChange, talentSpec fields (as per API documentation) do not exist in TBC (they return nil)
+		
 				if(name == nil) then
-					name = "player" .. j -- dirty fix
+					name = "player " .. j -- dirty fix, maybe not needed
 				else
-					name = self:removeServerName(name) -- TODO: check if this is working
-					-- name = name --TODO: alternative dirty fix
+					name = self:removeServerName(name)
 				end
 				
+				-- get the players team color (only self)
+				if (name == playerName) then
+					local playerTeamFaction = faction
+					if playerTeamFaction == 0 then
+						playerTeamColor = "PURPLE"	
+					else
+						playerTeamColor = "GOLD"
+					end
 
-				if (name == playerName) then -- we can only know the rating of the streamer
+					-- print('playerTeamColor:' .. playerTeamColor) -- debug
+
+					-- check if we won
+					if battlefieldWinnerTeam == playerTeamFaction then
+						-- print("I think we won") -- debug
+						M:setResult(1)
+					else
+						-- print("I think we lost") -- debug
+						M:setResult(2)
+					end
+				end
+
+				-- TODO: check what player "rating" is actually used for or if we don't need it at all
+				if ((name == playerName) and (isRatedArena)) then -- we can only know the rating of the streamer and only in rated games
 					local groupNum = max(GetNumGroupMembers())
 					if(M and bracketIndex[M.bracket]) then 
-						--rating = GetPersonalRatedInfo(bracketIndex[M.bracket])
-						rating = "999"
+						rating = GetPersonalRatedInfo(bracketIndex[M.bracket])
+						print("rating 999") -- debug
+						-- rating = "999"
 					elseif (bracketIndex[groupNum]) then -- Called if M gives a bad value, the preferred method in gladius
-						--rating = GetPersonalRatedInfo(bracketIndex[groupNum])
-						rating = "1000"
+						rating = GetPersonalRatedInfo(bracketIndex[groupNum])
+						print("rating 1000")  -- debug
+						-- rating = "1000"
 					else
 						local mpla = ceil(arenaPlayers/2)
 						if(bracketIndex[mpla]) then -- Not enough people joined on either team, one more attempt to guess the bracket
-							--rating = GetPersonalRatedInfo(bracketIndex[mpla])
-							rating = "1001"
-						else
-							rating = "0"
+							rating = GetPersonalRatedInfo(bracketIndex[mpla])
+							print("rating 1001")  -- debug
+							-- rating = "1001"
 						end
 					end
-				else
-					rating = "0"
-				end						
-				
-				-- TODO: does not work in skirms (mmr = 0), need to check for rated games
-				if (faction == 0) then mmr = greenBeforeMMR	else mmr = goldBeforeMMR end		
-				print("--- debug setPlayer in aav ---")
-				-- TODO: why is this all messed up with nil values and wrong order?
-				print(guids) -- gives a table
-				print("name: " .. name) -- gives the spec (= "nospec")
-				print("rating: " .. rating) -- gives 0 (at least in skirms)
-				--print("dmg done: " .. damageDone) -- TODO: get actual value, gives nil
-				--print("healing done: " .. healingDone) -- TODO: get actual value, gives nil
-				if(personalRatingChange) then
-					print("perso rating change: " .. personalRatingChange) -- TODO: get actual value, gives nil
-				else
-					print("perso rating nil")
+				elseif ((name == playerName) and (isUnratedArena)) then
+					print("unrated arena") -- debug
+					rating = "0 (skirm)"
+					ratingDiff = "0 (skirm)"
+					mmr = "0 (skirm)"
 				end
-				if(mmr) then
-					print("mmr: " .. mmr) -- TODO: check value
-				else
-					print("mmr nil")
-				end
-				if(specName) then
-					print("specName: " .. specName) --TODO: check value
-				else
-					print("specName nil")
-				end
-				--M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
-				M:setPlayer(guids,name, rating, 0, 0, 0, mmr, "nospec")
-			end
-			
-			for i=0,1 do			
-				M:setTeams(i, "Team " .. (i+1), 0, 0, 0)  --we pass 0 0 0 because anyway we don't longer use these stats we instead set them for each player using M:setPlayer(..)
+					
+				-- TODO: do wo really need this for each player or just once per team?
+				-- or for every other player than self ? need to test with real rated games... cant debug with skirms
+				if(isRatedArena) then
+					if (faction == 0) then
+						print("name to check: " .. name)
+						print("faction 0") -- debug
+
+						rating = oldTeamRating0 
+						ratingDiff = diff0
+						mmr = matchMakingRating0
+						print(rating) -- debug
+						print(ratingDiff) -- debug
+						print(mmr) -- debug
+					else 
+						print("faction 1") -- debug
+						print("name to check: " .. name)
+						rating = oldTeamRating1
+						ratingDiff = diff1
+						mmr = matchMakingRating1
+						print(rating) -- debug
+						print(ratingDiff) -- debug
+						print(mmr) -- debug
+					end
+				end		
+				-- print("--- debug setPlayer in aav ---")
+				-- M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
+				M:setPlayer(guids,name, rating, damageDone, healingDone, ratingDiff, mmr, "nospec")
 			end
 			
 			if (atroxArenaViewerData.current.broadcast) then
-				print("** Match ended **")
+				-- print("** Match ended **")
 				message["stats"] = {
 					event = AAV_COMM_EVENT["cmd_matchend"],
 					match = M:getTeams(),
@@ -851,7 +939,7 @@ function atroxArenaViewer:INSPECT_READY(event, guid, other)
 				if(guid == UnitGUID("raid" .. i)) then --should only happen once
 					if(M:getDudesData()[guid].spec == nil or strlen(M:getDudesData()[guid].spec) == 0) then
 						local specID = 0 --GetInspectSpecialization("raid" .. i)
-						local _, specName = "nospec" --GetSpecializationInfoByID(specID)
+						local specName = "nospec" --GetSpecializationInfoByID(specID)
 						if(specName) then 
 							M.combatans.dudes[guid].spec = specName
 						end
@@ -1146,7 +1234,7 @@ function atroxArenaViewer:UNIT_AURA(event, unit)
 end
 
 ----
--- Called when a name update is available, will set the name and spec
+-- Called when a name update is available, will set the name and spec (spec removed in TBC classic, because not available via API)
 -- @param event
 -- @param unit arena1, arena2...
 function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
@@ -1155,10 +1243,12 @@ function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
 		local sourceGUID = UnitGUID(unit)
 		
 		-- debugging prints
-		--print("========")
-		--print(sourceGUID)
-		--print(unit)
-		--print(M:getDudesData())
+		print("======== UNIT_NAME_UPDATE DEBUG MESSAGES")
+		print(sourceGUID)
+		print(unit)
+		print(UnitName(unit))
+		print(M:getDudesData())
+		print(M:getDudesData()[sourceGUID].name)
 		M:getDudesData()[sourceGUID].name = UnitName(unit)
 		self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
 		
@@ -1502,7 +1592,7 @@ function atroxArenaViewer:getSkillLegend(tab)
 		local name, _, icon = GetSpellInfo(tonumber(k))
 		icon = string.gsub(string.lower(icon), "interface\\icons\\", "")
 		if (not first) then str = str .. "," end
-		str = str .. '{"id":' .. tostrink .. ',"icon":"' .. icon .. '","name":"' .. name .. '"}'
+		str = str .. '{"id":' .. tostring(k) .. ',"icon":"' .. icon .. '","name":"' .. name .. '"}'
 		first = false
 	end
 	
@@ -1655,10 +1745,11 @@ function atroxArenaViewer:executeMatchData(tick, data)
 		end
 		
 	elseif (t == 11) then
-		-- cast interrupt, not implemented
-		
+		-- cast interrupt, not implemented -- TODO: check why not
+		T:interruptSkill(tonumber(data[3]), tonumber(data[4]), tonumber(data[5]), tonumber(data[6]))
+
 	elseif (t == 12) then
-		-- spell_interrupt
+		-- spell_interrupt -- TODO: check what is the difference between cast interrupt and spell interrupt
 		T:interruptSkill(tonumber(data[3]), tonumber(data[4]), tonumber(data[5]), tonumber(data[6]))
 		
 	elseif (t == 13) then

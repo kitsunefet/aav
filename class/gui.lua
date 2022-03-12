@@ -100,8 +100,8 @@ end
 function AAV_Gui:createEntityBar(parent, v, y)
 	local anchor, offx, manauser
 	
-	print("createEntityBar")
-	print("createEntityBar: " .. v.name)
+	--print("createEntityBar")
+	--print("createEntityBar: " .. v.name)
 
 	if (v.team==1) then anchor = "TOPLEFT" else anchor = "TOPRIGHT" end
 	if (v.team==1) then offx = 85 else offx = 355 end
@@ -366,7 +366,7 @@ end
 
 function AAV_Gui:createStatsFrame(parent)
 	
-	print("createStatsFrame")
+	--print("createStatsFrame")
 	local stats = CreateFrame("Frame", "$parentStats", parent)
 	stats:SetHeight(parent:GetHeight())
 	stats:SetWidth(parent:GetWidth())
@@ -427,7 +427,7 @@ function AAV_Gui:createDetailTeam(parent, num, bracket)
 end
 
 function AAV_Gui:createButtonDetail(parent)
-	print("createButtonDetail")
+	--print("createButtonDetail")
 	local detail = CreateFrame("BUTTON", "$parentViewDetail", parent, "UIPanelButtonTemplate")
 	detail:SetPoint("BOTTOMRIGHT", -10, 15)
 	detail:SetWidth(120)

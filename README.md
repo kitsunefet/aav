@@ -43,6 +43,7 @@ Known Bugs
 * crowd control timers overlap with existing timers (good visible by Heroism)
 * in rare cases stealth classes are not visible at all
 * during broadcasting the icon and healthbar of combatants may switch places in rare cases and the buff and debuf bar doesn't fit
+* interrupts do not show ("X") on interrupted spell in play match window
 
 FAQ
 ---
