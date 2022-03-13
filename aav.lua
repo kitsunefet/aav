@@ -602,7 +602,7 @@ end
 -- status 1 = in queue, in arena: message board; 2 = entered
 function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 
-	print("battlefield status: " .. tostring(status))
+	-- print("battlefield status: " .. tostring(status))
 	if (atroxArenaViewerData.current.broadcast or atroxArenaViewerData.current.record and M) then
 		--[[
 		if (atroxArenaViewerData.current.broadcast and status == 1 and currentstate == 2) then
@@ -642,22 +642,21 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 		
 			local arenaPlayers = GetNumBattlefieldScores()  -- Number of participant scores available in the current battleground; 0 if not in a battleground (number)
 			local playerName = GetUnitName("player", false)
-			-- local _, _, _, greenBeforeMMR = GetBattlefieldTeamInfo(0)
-			-- local _, _, _, goldBeforeMMR = GetBattlefieldTeamInfo(1)
 			local IsActiveBattlefieldArena,GetBattlefieldWinner,GetBattlefieldTeamInfo
 				= IsActiveBattlefieldArena,GetBattlefieldWinner,GetBattlefieldTeamInfo
 			local n = 1 --Chatframe#
-			local teamName0, oldTeamRating0, newTeamRating0, matchMakingRating0 = GetBattlefieldTeamInfo(0) -- Purple Team = 0
-			local teamName1, oldTeamRating1, newTeamRating1, matchMakingRating1 = GetBattlefieldTeamInfo(1) -- Gold Team = 1
+			local teamName0, oldTeamRating0, newTeamRating0, matchMakingRating0 = GetBattlefieldTeamInfo(0) -- Team = 0
+			local teamName1, oldTeamRating1, newTeamRating1, matchMakingRating1 = GetBattlefieldTeamInfo(1) -- Team = 1
 			local diff0 = newTeamRating0 - oldTeamRating0
 			local diff1 = newTeamRating1 - oldTeamRating1
 			local playerTeamColor = 'nocolor'
 			local isUnratedArena, isRatedArena = IsActiveBattlefieldArena() 
 			local battlefieldWinnerTeam = GetBattlefieldWinner() -- 0 = purple team, 1 = gold team
-			
+
 			if (battlefieldWinnerTeam == nil) then
-				print("no winner") -- debug message
-				return -- should not happen..
+				-- sometires the event is fired (updates?) within arena, so just return
+				print("no winner")
+				return
 			else
 				print("winner team: " .. battlefieldWinnerTeam) -- debug message
 			end
@@ -671,7 +670,7 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 				print(diff0) -- debug message
 				print(matchMakingRating0) -- debug message
 				-- team (id), name (team), rating, diff, mmr
-				M:setTeams(0, teamName0, oldTeamRating0, diff0, matchMakingRating0)  --test0
+				M:setTeams(0, teamName0, oldTeamRating0, diff0, matchMakingRating0)
 				
 				print("--- team 1 ---")
 				print(teamName1) -- debug message
@@ -679,27 +678,28 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 				print(diff1) -- debug message
 				print(matchMakingRating1) -- debug message
 				-- team (id), name (team), rating, diff, mmr
-				M:setTeams(1, teamName1, oldTeamRating1, diff1, matchMakingRating1)  --test1
+				M:setTeams(1, teamName1, oldTeamRating1, diff1, matchMakingRating1)
 	
 				local ChatFrame = _G["ChatFrame"..n]
-				ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team
-				ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team
+				ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team -- TODO: color may be wrong, actually just team 0 (own team)
+				ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team -- TODO: color may be wrong, actually just team 1 (other team)
 			end
 
 			if (isUnratedArena) then
 				print("unrated arena match") -- debug message
 				
 				-- team (id), name (team), rating, diff, mmr
-				M:setTeams(0, "skirmish",  "0 (skirm)",  "0 (skirm)",  "0 (skirm)")
 				teamName0 = "skirmteam0"
+				M:setTeams(0, teamName0,  "skirm: -",  0,  0)
 				
-								-- team (id), name (team), rating, diff, mmr
-				M:setTeams(1, "skirmish",  "0 (skirm)",  "0 (skirm)",  "0 (skirm)")
+				-- team (id), name (team), rating, diff, mmr
 				teamName1 = "skirmteam1"
+				M:setTeams(1, teamName1,  "skirm: -",  0,  0)
+				
 
 				local ChatFrame = _G["ChatFrame"..n]
-				ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team
-				ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team
+				ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team -- TODO: color may be wrong, actually just team 0 (own team)
+				ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team -- TODO: color may be wrong, actually just team 1 (other team)
 			end
 
 			local bracketIndex = {}
@@ -707,7 +707,7 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			bracketIndex[3] = 2
 			bracketIndex[5] = 3
 			local mmr = 0
-			local rating = "0"
+			local rating = 0
 			local ratingDiff = 0
 			
 			for j=1, arenaPlayers do
@@ -721,14 +721,14 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 				else
 					name = self:removeServerName(name)
 				end
-				
+
 				-- get the players team color (only self)
 				if (name == playerName) then
 					local playerTeamFaction = faction
 					if playerTeamFaction == 0 then
-						playerTeamColor = "PURPLE"	
+						playerTeamColor = "PURPLE"	-- 0
 					else
-						playerTeamColor = "GOLD"
+						playerTeamColor = "GOLD" -- 1
 					end
 
 					-- print('playerTeamColor:' .. playerTeamColor) -- debug
@@ -764,9 +764,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 				elseif ((name == playerName) and (isUnratedArena)) then
 					print("unrated arena") -- debug
-					rating = "0 (skirm)"
-					ratingDiff = "0 (skirm)"
-					mmr = "0 (skirm)"
+					rating = "skirm: -"
+					ratingDiff = 0
+					mmr = 0
 				end
 					
 				-- TODO: do wo really need this for each player or just once per team?
@@ -776,7 +776,7 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 						print("name to check: " .. name)
 						print("faction 0") -- debug
 
-						rating = oldTeamRating0 
+						rating = oldTeamRating0
 						ratingDiff = diff0
 						mmr = matchMakingRating0
 						print(rating) -- debug
@@ -785,6 +785,7 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					else 
 						print("faction 1") -- debug
 						print("name to check: " .. name)
+
 						rating = oldTeamRating1
 						ratingDiff = diff1
 						mmr = matchMakingRating1
@@ -792,7 +793,30 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 						print(ratingDiff) -- debug
 						print(mmr) -- debug
 					end
-				end		
+				end
+				if(isUnratedArena) then
+					if (faction == 0) then
+						print("name to check: " .. name)
+						print("faction 0") -- debug
+
+						-- rating = oldTeamRating0
+						-- ratingDiff = diff0
+						-- mmr = matchMakingRating0
+						print(rating) -- debug
+						print(ratingDiff) -- debug
+						print(mmr) -- debug
+					else 
+						print("faction 1") -- debug
+						print("name to check: " .. name)
+
+						-- rating = oldTeamRating1
+						-- ratingDiff = diff1
+						-- mmr = matchMakingRating1
+						print(rating) -- debug
+						print(ratingDiff) -- debug
+						print(mmr) -- debug
+					end
+				end	
 				-- print("--- debug setPlayer in aav ---")
 				-- M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
 				M:setPlayer(guids,name, rating, damageDone, healingDone, ratingDiff, mmr, "nospec")

@@ -256,9 +256,9 @@ end
 -- @param mmr
 function AAV_MatchStub:setTeams(team, name, rating, diff, mmr)
 	self.teams[team].name = name
-	self.teams[team].rating = rating --not used anymore now every player has its own rating 
-	self.teams[team].diff = diff --not used anymore now every player has its own ratingchange
-	self.teams[team].mmr = mmr --not used anymore
+	self.teams[team].rating = rating -- teamrating before
+	self.teams[team].diff = diff -- rating diff
+	self.teams[team].mmr = mmr -- team mmr rating
 end
 
 ----
@@ -279,7 +279,7 @@ function AAV_MatchStub:setPlayer(guids, playerName, rating, damageDone, healingD
 	end
 	
 	-- print("--- debug setPlayer in matchstub ---")
-	-- print(guid) --TODO: gives nil, check why. maybe because name is not name, but rather specName.
+	-- print(guid)
 	-- print(guids)
 	-- print(playerName)
 	-- print(rating)

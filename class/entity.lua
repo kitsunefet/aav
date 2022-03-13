@@ -95,7 +95,7 @@ function AAV_PlayerEntity:setHealthBarText()
 	local min, max = self.bar:GetMinMaxValues()
 	local value = self.bar:GetValue()
 	
-	-- check for percentage or aboslute values
+	-- check for percentage or absolute values
 	if (value == 0) then
 		txt = "Dead"
 	else

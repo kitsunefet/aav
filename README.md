@@ -44,6 +44,7 @@ Known Bugs
 * in rare cases stealth classes are not visible at all
 * during broadcasting the icon and healthbar of combatants may switch places in rare cases and the buff and debuf bar doesn't fit
 * interrupts do not show ("X") on interrupted spell in play match window
+* team names in match stats not aligned correctly for 3s/5s matches
 
 FAQ
 ---

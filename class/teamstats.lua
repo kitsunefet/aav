@@ -72,9 +72,14 @@ function AAV_TeamStats:setValue(parent, teamdata, matchdata, team, bracket)
 			end
 			
 			local higestDamage = w.hcrit .."\n" .. self:trunkHCritSpellName(w.hCritName)
-			
+			local class
+			if (w.class) then
+				class = w.class
+			else
+				class = "UNKNOWN"
+			end
 			self.entries[i]["entry"]:Show()
-			self.entries[i]["icon"].texture:SetTexture("Interface\\Addons\\aav\\res\\" .. w.class .. ".tga")
+			self.entries[i]["icon"].texture:SetTexture("Interface\\Addons\\aav\\res\\" .. class .. ".tga")
 			self.entries[i]["name"]:SetText(w.name)
 			self.entries[i]["name"]:SetTextColor(AAV_Util:getTargetColor(w, true))
 			self.entries[i]["damage"]:SetText(w.ddone)
