@@ -233,16 +233,16 @@ function AAV_TableGui:fillMatchesTable()
 			data[row].cols[3] = { ["value"] = mapname };
 
 			-- own team name
-			data[row].cols[4] = { ["value"] = ownTeam };
+			data[row].cols[4] = { ["value"] = ownTeam or nil };
 			
 			-- matchUp (both teams classes xx vs yy)
 			data[row].cols[5] = { ["value"] = matchUp };
 
 			-- enemy team name
-			data[row].cols[6] = { ["value"] = enemyTeam };
+			data[row].cols[6] = { ["value"] = enemyTeam or nil };
 
 			-- match result
-			data[row].cols[7] = { ["value"] = matchResult };
+			data[row].cols[7] = { ["value"] = matchResult or nil };
 
 			-- own team rating + diff
 			data[row].cols[8] = { ["value"] = ownTeamRating .. " (" .. ownTeamRatingDiff .. ")" };
@@ -379,13 +379,27 @@ function AAV_TableGui:determineMatchSummary(num)
 		return sortedNames
 	end
 	local matchUp = sortNames(teamOne) .. "  vs  " .. sortNames(teamTwo)
-	ownTeamRating = teamdata[0]["rating"]
-	ownTeamMMR = teamdata[0]["mmr"]
-	ownTeamRatingDiff = teamdata[0]["diff"]
+	
+	-- set ratings, catch nil values (happens e.g. if you leave arena early)
+	if (teamdata[0]["rating"]) then
+		ownTeamRating = teamdata[0]["rating"]
+		ownTeamMMR = teamdata[0]["mmr"]
+		ownTeamRatingDiff = teamdata[0]["diff"]
+	else
+		ownTeamRating = 0
+		ownTeamMMR = 0
+		ownTeamRatingDiff = 0
+	end
 
-	enemyTeamRating = teamdata[1]["rating"]
-	enemyTeamMMR = teamdata[1]["mmr"]
-	enemyTeamRatingDiff = teamdata[0]["diff"]
+	if (teamdata[1]["rating"]) then
+		enemyTeamRating = teamdata[1]["rating"]
+		enemyTeamMMR = teamdata[1]["mmr"]
+		enemyTeamRatingDiff = teamdata[1]["diff"]
+	else
+		enemyTeamRating = 0
+		enemyTeamMMR = 0
+		enemyTeamRatingDiff = 0
+	end
 
 	return startTime, elapsedStr, mapname, matchUp, ownTeam, enemyTeam, matchResult, ownTeamRating, ownTeamMMR, ownTeamRatingDiff, enemyTeamRating, enemyTeamMMR, enemyTeamRatingDiff
 end
