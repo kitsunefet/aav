@@ -1,5 +1,5 @@
-## Title: AAV - atrox Arena Viewer
-## Author: zwacky
+## Title: AAV - atrox Arena Viewer (TBC classic)
+## Author: zwacky (real OG), Skeledurr and Nookyx
 ## Interface: 20503
 ## SavedVariables: atroxArenaViewerData
 ## Notes: record and view arena replays.
