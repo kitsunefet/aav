@@ -144,30 +144,30 @@ function AAV_TableGui:createMatchesTable()
 			["name"] = "Enemy Team",
 			["width"] = 125,
 		}, -- [6]
-		{
-			["name"] = "Result",
-			["width"] = 50,
-		}, -- [7]
+		-- {
+		-- 	["name"] = "Result",
+		-- 	["width"] = 50,
+		-- }, -- [7]
 		{
 			["name"] = "Rating",
 			["width"] = 70,
-		}, -- [8]
+		}, -- [7]
 		{
 			["name"] = "MMR",
 			["width"] = 70,
-		}, -- [9]
+		}, -- [8]
 		{
 			["name"] = "Enemy Rating",
 			["width"] = 70,
-		}, -- [10]
+		}, -- [9]
 		{
 			["name"] = "Enemy MMR",
 			["width"] = 70,
-		}, -- [11]
+		}, -- [10]
 		{
 			["name"] = "Delete",
 			["width"] = 50,
-		}, -- [12]
+		}, -- [11]
 	};
 	matchesTable = ScrollingTable:CreateST(cols, 20, 22, nil, matchesFrame);
 	matchesTable:RegisterEvents({
@@ -233,50 +233,46 @@ function AAV_TableGui:fillMatchesTable()
 			data[row].cols[3] = { ["value"] = mapname };
 
 			-- own team name
-			data[row].cols[4] = { ["value"] = ownTeam or nil };
+			data[row].cols[4] = { ["value"] = ownTeam };
 			
 			-- matchUp (both teams classes xx vs yy)
 			data[row].cols[5] = { ["value"] = matchUp };
 
 			-- enemy team name
-			data[row].cols[6] = { ["value"] = enemyTeam or nil };
+			data[row].cols[6] = { ["value"] = enemyTeam};
 
-			-- match result
-			data[row].cols[7] = { ["value"] = matchResult or nil };
+			-- match result -> removed column for now because we just colorize the rating change, looks better imho. may overthin that decision so not yet deleted
+			--data[row].cols[7] = { ["value"] = "" };
 
 			-- own team rating + diff
-			data[row].cols[8] = { ["value"] = ownTeamRating .. " (" .. ownTeamRatingDiff .. ")" };
+			data[row].cols[7] = { ["value"] = ownTeamRating .. " (" .. ownTeamRatingDiff .. ")" };
 
+			-- make the world more colorful
 			if (matchResult and matchResult == "WIN") then
 				data[row].cols[7].color = wonMatchColor
-				data[row].cols[8].color = wonMatchColor
 			elseif (matchResult and matchResult == "LOSS") then
 				data[row].cols[7].color = lostMatchColor
-				data[row].cols[8].color = lostMatchColor
 			end
 
 			-- own team MMR
-			data[row].cols[9] = { ["value"] = ownTeamMMR };
-			--data[row].cols[8] = { ["value"] = teamOneRating };
+			data[row].cols[8] = { ["value"] = ownTeamMMR };
 
 			-- enemy team rating
-			data[row].cols[10] = { ["value"] = enemyTeamRating .. " (" .. enemyTeamRatingDiff .. ")" };
-			--data[row].cols[8] = { ["value"] = teamOneRating };
+			data[row].cols[9] = { ["value"] = enemyTeamRating .. " (" .. enemyTeamRatingDiff .. ")" };
 
 			-- enemy team MMR
-			data[row].cols[11] = { ["value"] = enemyTeamMMR };
-			--data[row].cols[8] = { ["value"] = teamOneRating };
+			data[row].cols[10] = { ["value"] = enemyTeamMMR };
 
 			-- delete
-			data[row].cols[12] = { ["value"] = "DELETE" };
-			data[row].cols[12].color = deleteColor
+			data[row].cols[11] = { ["value"] = "DELETE" };
+			data[row].cols[11].color = deleteColor
 
 
 		end
 	else
 		data[1] = {};
 		data[1].cols = {};
-		for i = 1, 12 do
+		for i = 1, 11 do
 			data[1].cols[i] = { ["value"] = "None" }; -- if no data available (empty data)
 		end
 	end
