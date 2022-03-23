@@ -36,8 +36,8 @@ local message = {
 -- GLOBALS
 -------------------------
 AAV_VERSIONMAJOR = 1
-AAV_VERSIONMINOR = 3
-AAV_VERSIONBUGFIX = 3
+AAV_VERSIONMINOR = 4
+AAV_VERSIONBUGFIX = 0
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -656,24 +656,13 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 
 			if (battlefieldWinnerTeam == nil) then
 				-- sometires the event is fired (updates?) within arena, so just return
-				print("no winner")
 				return
-			else
-				print("winner team: " .. battlefieldWinnerTeam) -- debug message
 			end
-
-			local bracketIndex = {}
-			bracketIndex[2] = 1
-			bracketIndex[3] = 2
-			bracketIndex[5] = 3
-			local mmr = 0
-			local rating = 0
-			local ratingDiff = 0
 			
 			for j=1, arenaPlayers do
 				local name, killingBlows, honorableKills, deaths, honorGained, faction, _, race, class, classToken, damageDone, healingDone, _, _, _, _, _ = GetBattlefieldScore(j);
    				-- original: local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange, preMatchMMR, mmrChange, talentSpec = GetBattlefieldScore(index)
-			    -- no some fields are always 0, no idea what that field between faction and race represents
+			    -- no some fields are always 0 or nil, no idea what that field between faction and race represents
 				-- bgRating, ratingChange, preMatchMMR, mmrChange, talentSpec fields (as per API documentation) do not exist in TBC (they return nil)
 		
 				if(name == nil) then
@@ -682,7 +671,7 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					name = self:removeServerName(name)
 				end
 
-				-- get the players team color (only self)
+				-- get the players team color (only self), currently we do nothing with this info
 				if (name == playerName) then
 					local playerTeamFaction = faction
 					if playerTeamFaction == 0 then
@@ -703,23 +692,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 				end
 
-				-- TODO: check what player "rating" is actually used for or if we don't need it at all
 				-- do stuff that only needs to be done once, so just do it while we iterate the player themselves
 				if ((name == playerName) and (isRatedArena)) then
-					print("rated arena match")
-
-					print("--- team 0 ---")
-					print(teamName0) -- debug message
-					print(oldTeamRating0) -- debug message
-					print(diff0) -- debug message
-					print(matchMakingRating0) -- debug message
-
-					print("--- team 1 ---")
-					print(teamName1) -- debug message
-					print(oldTeamRating1) -- debug message
-					print(diff1) -- debug message
-					print(matchMakingRating1) -- debug message
-
+					--print("rated arena match") -- debug message
 
 					-- always set our own team to id 0, even if we were in team ("faction") 1, to make other stuff easier to manage (e.g. sorting columns in matches table)
 					-- enemy team is always set to id 1 for the same reason
@@ -737,30 +712,8 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team
 					ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team
 
-					local groupNum = max(GetNumGroupMembers()) -- we can only know the rating of the streamer and only in rated games
-					print("--- DEBUG GetPersonalRatedInfo ---")
-					print(groupNum)
-					print(bracketIndex[M.bracket])
-					print(bracketIndex[groupNum])
-					print(bracketIndex[ceil(arenaPlayers/2)])
-					if(M and bracketIndex[M.bracket]) then
-						rating = GetPersonalRatedInfo(bracketIndex[M.bracket])
-						print("rating 999") -- debug
-						-- rating = "999"
-					elseif (bracketIndex[groupNum]) then -- Called if M gives a bad value, the preferred method in gladius
-						rating = GetPersonalRatedInfo(bracketIndex[groupNum])
-						print("rating 1000")  -- debug
-						-- rating = "1000"
-					else
-						local mpla = ceil(arenaPlayers/2)
-						if(bracketIndex[mpla]) then -- Not enough people joined on either team, one more attempt to guess the bracket
-							rating = GetPersonalRatedInfo(bracketIndex[mpla])
-							print("rating 1001")  -- debug
-							-- rating = "1001"
-						end
-					end
 				elseif ((name == playerName) and (isUnratedArena) and not (isRatedArena)) then
-					print("unrated arena match") -- debug message
+					--print("unrated arena match") -- debug message
 					
 					-- same reason to always set own team to id 0 and enemy team to id 1 as for rated games, see comments further above
 					if (faction == 0) then
@@ -780,65 +733,12 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					local ChatFrame = _G["ChatFrame"..n]
 					ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team
 					ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team
-					
-					-- set dummy values because hey, its just a skirm
-					rating = "skirm: -"
-					ratingDiff = 0
-					mmr = 0
 				end
 					
-				-- TODO: do wo really need this for each player or just once per team?
-				-- or for every other player than self ? need to test with real rated games... cant debug with skirms
-				if(isRatedArena) then
-					if (faction == 0) then
-						print("--- debug player ratings ---")
-						print("name to check: " .. name)
-						print("faction 0") -- debug
-
-						rating = oldTeamRating0
-						ratingDiff = diff0
-						mmr = matchMakingRating0
-						print(rating) -- debug
-						print(ratingDiff) -- debug
-						print(mmr) -- debug
-					else
-						print("--- debug player ratings ---")
-						print("faction 1") -- debug
-						print("name to check: " .. name)
-
-						rating = oldTeamRating1
-						ratingDiff = diff1
-						mmr = matchMakingRating1
-						print(rating) -- debug
-						print(ratingDiff) -- debug
-						print(mmr) -- debug
-					end
-				end
-				if(isUnratedArena and not isRatedArena) then
-					if (faction == 0) then
-						print("name to check: " .. name)
-						print("faction 0") -- debug
-
-						-- rating = oldTeamRating0
-						-- ratingDiff = diff0
-						-- mmr = matchMakingRating0
-						print(rating) -- debug
-						print(ratingDiff) -- debug
-						print(mmr) -- debug
-					else
-						print("faction 1") -- debug
-						print("name to check: " .. name)
-
-						-- rating = oldTeamRating1
-						-- ratingDiff = diff1
-						-- mmr = matchMakingRating1
-						print(rating) -- debug
-						print(ratingDiff) -- debug
-						print(mmr) -- debug
-					end
-				end
-				-- M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
-				M:setPlayer(guids,name, rating, damageDone, healingDone, ratingDiff, mmr, "nospec")
+				-- original: M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
+				-- note: rating, personalRatingChange and mmr are not obtainable on a per-player basis in TBC classic, just per-team. so we always set 0 for now
+				-- maybe we'll find some way in the future?
+				M:setPlayer(guids,name, 0, damageDone, healingDone, 0, 0, "nospec")
 			end
 			
 			if (atroxArenaViewerData.current.broadcast) then
@@ -1292,6 +1192,7 @@ function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
 		-- print(UnitName(unit))
 		-- print(M:getDudesData())
 		-- print(M:getDudesData()[sourceGUID].name)
+		-- TODO: sometimes the first line throws an error, check why
 		M:getDudesData()[sourceGUID].name = UnitName(unit)
 		self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
 		

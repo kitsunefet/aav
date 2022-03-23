@@ -188,23 +188,6 @@ function AAV_TableGui:createMatchesTable()
 	});
 end
 
-
--- debug function
-local tabLevel = 0
-local function printTable(table)
-    for key,value in pairs(table) do
-        if type(value) == "table" then
-	        tabLevel = tabLevel + 1
-	        print(string.rep("    ",tabLevel - 1)..key.." : {")
-            printTable(value)
-            print(string.rep("    ",tabLevel - 1).."}")
-            tabLevel = tabLevel - 1
-        else
-            print(string.rep("    ",tabLevel)..key,value)
-        end
-    end
-end
-
 ----
 -- Fills in the data in the matches results table. Called by showMatchesFrame().
 function AAV_TableGui:fillMatchesTable()	
@@ -252,6 +235,8 @@ function AAV_TableGui:fillMatchesTable()
 				data[row].cols[7].color = wonMatchColor
 			elseif (matchResult and matchResult == "LOSS") then
 				data[row].cols[7].color = lostMatchColor
+			else
+				data[row].cols[7].color = unknownMatchColor
 			end
 
 			-- own team MMR
@@ -328,10 +313,9 @@ function AAV_TableGui:determineMatchSummary(num)
 		matchResult = "LOSS"
 	else -- catch all, should not occur
 		matchResult = atroxArenaViewerData.data[num]["result"]
-		--print("unknownMatchColor no valid result") -- debug
 	end
 
-	-- ???
+	-- set teamOne, teamTwo
 	local teamOne, teamTwo = {}, {}
 	for k ,v in pairs(teamdata) do
 		local team = k+1

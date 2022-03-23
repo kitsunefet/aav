@@ -53,22 +53,24 @@ function AAV_TeamStats:setValue(parent, teamdata, matchdata, team, bracket)
 	
 	for c,w in pairs(matchdata) do
 		if (w.player == true and w.team == team) then
-			if (w.ratingChange and w.ratingChange >= 0) then 
-				diff = "+" .. w.ratingChange 
+			
+			
+			if (teamdata.diff and teamdata.diff >= 0) then 
+				diff = "+" .. teamdata.diff
 			else 
-				diff = w.ratingChange 
+				diff = teamdata.diff
 			end
 
-			if (not w.rating) then
+			if (not teamdata.rating) then
 				rating = "? (" .. diff .. ")" 
 			else 
-				rating = w.rating .. " (" .. diff .. ")" 
+				rating = teamdata.rating .. " (" .. diff .. ")" 
 			end
 
-			if (not w.mmr) then 
+			if (not teamdata.mmr) then 
 				mmr = "-" 
 			else 
-				mmr = w.mmr 
+				mmr = teamdata.mmr 
 			end
 			
 			local higestDamage = w.hcrit .."\n" .. self:trunkHCritSpellName(w.hCritName)

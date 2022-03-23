@@ -38,9 +38,7 @@ end
 
 function AAV_MatchStub:setResult(winnerteamid)
 	local winnerid = winnerteamid
-	-- print("set result to winnerid: " .. winnerid) -- debug
 	self.result = winnerid
-	-- print("result: " .. self.result) -- debug
 end
 ----
 -- saves temporary data to variables.
@@ -278,16 +276,6 @@ function AAV_MatchStub:setPlayer(guids, playerName, rating, damageDone, healingD
 		guid = self:getNametoGUID(playerName) --enemey guid is still present even if they already left
 	end
 	
-	-- print("--- debug setPlayer in matchstub ---")
-	-- print(guid)
-	-- print(guids)
-	-- print(playerName)
-	-- print(rating)
-	-- print(damageDone)
-	-- print(healingDone)
-	-- print(personalRatingChange)
-	-- print(mmr)
-	-- print(spec)
 	self.combatans.dudes[guid].rating = rating -- atm no api to get others rating
 	self.combatans.dudes[guid].ddone = damageDone
 	self.combatans.dudes[guid].hdone = healingDone
@@ -348,7 +336,6 @@ end
 -- sets the match end from the first and the last data.
 -- as of 1.1.7 brackets are verified if they consist of 2, 3 or 5 and not nil.
 function AAV_MatchStub:setMatchEnd()
-	--print("setMatchEnd")
 	local max, a, b = table.getn(self.data), 0, 0
 	if (self.data[1] and max) then
 		a = AAV_Util:split(self.data[1], ",")

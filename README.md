@@ -3,7 +3,7 @@ AAV TBC Classic - Atrox Arena Viewer
 ===
 
 **TBC Classic**
-This is a ressurection of Atrox Arena Viewer to work with TBC Classic. The original addon uses some WoW API that is not available to TBC Classic, the features using the unavailable API have been reworked.
+This is a ressurection of Atrox Arena Viewer to work with TBC Classic. The original addon uses some WoW API that is not available to TBC Classic, the features using the unavailable API have been reworked/replaced (if possible) or removed.
 
 ===
 
@@ -45,10 +45,9 @@ Known Bugs
 * during broadcasting the icon and healthbar of combatants may switch places in rare cases and the buff and debuf bar doesn't fit
 * interrupts do not always show ("X") on interrupted spell in play match window
 * team names in match stats not aligned correctly for 3s/5s matches
-* team ordering in matches table sometimes incorrect (enemy team on left, rating columns inverted)
 * sometimes while in arena a LUA error keeps popping up every second, has something to do with spell auras. need to analyze further
 * sometimes class icons are missing in the matches table. no idea why, yet..
-* personal rating/personal mmr stats are not displayed at all in match stats
+* sometimes a LUA eror is thrown after an arena match has completed, need to analyze further
 
 FAQ
 ---
