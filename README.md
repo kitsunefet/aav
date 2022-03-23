@@ -78,3 +78,8 @@ This happens when your combat log and any addons that use the COMBAT_LOG_EVENT_U
 **The damage in the score board doesn't match with my recount's, why?**
 
 In the current version pets are completely disabled, means, their damage and contribution doesn't count yet.
+
+**CREDITS**
+---
+Shoutout to the OG addon author [zwacky](https://twitter.com/zwacky) for creating such a wonderful WoW Arena PvP Addon! It really helped me blame my teammates a lot of times ;)
+Further credits go to [skeledurr](https://github.com/Skeledurr/aav) for doing a lot of preparation work to make this workable in TBC Classic.
