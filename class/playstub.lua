@@ -748,6 +748,14 @@ function AAV_PlayStub:getCurrentBracket()
 			end
 		end
 	end
+	-- if bracket is not 2, 3 or 5, someone of our team did not join, so we try to get the bracket from the enemy teams dudes
+	if bracket ~= 2 or bracket ~= 3 or bracket ~= 5 then
+		for k,v in pairs(self.data.combatans.dudes) do
+			if (v.team == 2 and v.player == true) then
+				bracket = bracket + 1
+			end
+		end
+	end
 	return bracket
 end
 
@@ -863,7 +871,10 @@ function AAV_PlayStub:handleIndexCreation(val)
 end
 
 function AAV_PlayStub:createStats(teamdata, matchdata, bracket)
-	-- print("createStats") -- debug
+	if AAV_DEBUG_MODE then
+		print("createStats") -- debug
+	end
+	self.pool.stats = {} -- kind of a hack to re-align team-name position in stats frame
 	local num = 1
 	if (#self.pool.stats == 0) then -- if empty
 		for k,v in pairs(teamdata) do		
@@ -872,7 +883,7 @@ function AAV_PlayStub:createStats(teamdata, matchdata, bracket)
 			table.insert(self.pool.stats, stat)
 			num = num + 1
 		end
-	else
+	else -- because of the "hack" this should never be true. found no better way to fix yet.
 		for k,v in pairs(teamdata) do
 			self.pool.stats[num]:setValue(self.stats, v, matchdata, k+1, bracket)
 			num = num + 1

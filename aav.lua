@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 0
+AAV_VERSIONBUGFIX = 1
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -90,6 +90,8 @@ AAV_CC_MAXLISTING = 5
 
 AAV_DETAIL_ENTRYHEIGHT = 20
 AAV_DETAIL_ENTRYWIDTH = 560
+
+AAV_DEBUG_MODE = false
 
 AAV_COMM_LOOKUPBROADCAST = "AAVLookup"
 AAV_COMM_HANDLEMATCHDATA = "AAVHandle"
@@ -708,9 +710,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 					
 					-- further debug messages, got this stuff from the addon !mmr(Match Making Rating), credits to PacMan
-					local ChatFrame = _G["ChatFrame"..n]
-					ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team
-					ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team
+					-- local ChatFrame = _G["ChatFrame"..n]
+					-- ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team
+					-- ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team
 
 				elseif ((name == playerName) and (isUnratedArena) and not (isRatedArena)) then
 					--print("unrated arena match") -- debug message
@@ -730,9 +732,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 					
 					-- further debug messages, got this stuff from the addon !mmr(Match Making Rating), credits to PacMan
-					local ChatFrame = _G["ChatFrame"..n]
-					ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team
-					ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team
+					-- local ChatFrame = _G["ChatFrame"..n]
+					-- ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team
+					-- ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team
 				end
 					
 				-- original: M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
@@ -1186,15 +1188,21 @@ function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
 		local sourceGUID = UnitGUID(unit)
 		
 		-- debugging prints
-		-- print("======== UNIT_NAME_UPDATE DEBUG MESSAGES")
-		-- print(sourceGUID)
-		-- print(unit)
-		-- print(UnitName(unit))
-		-- print(M:getDudesData())
-		-- print(M:getDudesData()[sourceGUID].name)
-		-- TODO: sometimes the first line throws an error, check why
-		M:getDudesData()[sourceGUID].name = UnitName(unit)
-		self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
+		if AAV_DEBUG_MODE then
+			print("======== UNIT_NAME_UPDATE DEBUG MESSAGES")
+			print(sourceGUID)
+			print(unit)
+			print(UnitName(unit))
+			print(M:getDudesData())
+			print(M:getDudesData()[sourceGUID].name)
+			-- TODO: sometimes the first line throws an error, check why
+		end
+		if(UnitName(unit)) then
+			M:getDudesData()[sourceGUID].name = UnitName(unit)
+			self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
+		else
+			print("error")
+		end
 		
 		if(strsub(unit, 1, strlen(unit)-1) ~= "raid") then
 			M:SetOpponentSpec(sourceGUID, strsub(unit, strlen(unit)))

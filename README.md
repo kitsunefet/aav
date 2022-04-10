@@ -44,7 +44,6 @@ Known Bugs
 * in rare cases stealth classes are not visible at all
 * during broadcasting the icon and healthbar of combatants may switch places in rare cases and the buff and debuf bar doesn't fit
 * interrupts do not always show ("X") on interrupted spell in play match window
-* team names in match stats not aligned correctly for 3s/5s matches
 * sometimes while in arena a LUA error keeps popping up every second, has something to do with spell auras. need to analyze further
 * sometimes class icons are missing in the matches table. no idea why, yet..
 * sometimes a LUA eror is thrown after an arena match has completed, need to analyze further

@@ -6,6 +6,11 @@ AAV_Gui.__index = AAV_Gui
 
 function AAV_Gui:createPlayerFrame(obj, bracket)
 	
+	-- if AAV_DEBUG_MODE then
+	-- 	print("AAV_Gui:createPlayerFrame")
+	-- 	print("bracket: " .. bracket)
+	-- end
+
 	if (not bracket) then
 		return
 	end
@@ -88,7 +93,15 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 end
 
 function AAV_Gui:setPlayerFrameSize(frame, bracket)
-	frame:SetHeight(110 + (AAV_GUI_VERTICALFRAMEDISTANCE * tonumber(bracket)))
+	-- set size for cases where bracket size could not be determined safely, so we guess the size here
+	if bracket == 0 or bracket == 1 then
+		frame:SetHeight(110 + (AAV_GUI_VERTICALFRAMEDISTANCE * 2))
+	elseif bracket == 4 then
+		frame:SetHeight(110 + (AAV_GUI_VERTICALFRAMEDISTANCE * 5))
+	else
+		frame:SetHeight(110 + (AAV_GUI_VERTICALFRAMEDISTANCE * tonumber(bracket))) -- all other cases (this could still be wrong e.g. only 3 out of 5 ppl joined, so we calculated 3 as bracket size)
+	end
+	
 end
 
 ----
@@ -438,6 +451,10 @@ function AAV_Gui:createButtonDetail(parent)
 end
 
 function AAV_Gui:createTeamHead(parent, posY, team)
+
+	if AAV_DEBUG_MODE then
+		print("AAV_GUI:createTeamHead")
+	end
 	
 	local head = parent:CreateFontString("$parentName", "ARTWORK", "GameFontNormal")
 	head:SetFont("Fonts\\FRIZQT__.TTF", 20, "OUTLINE")

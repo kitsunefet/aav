@@ -68,6 +68,14 @@ function AAV_MatchStub:setBracket()
 			bracket = bracket + 1
 		end
 	end
+	-- if bracket is not 2, 3 or 5, someone of our team did not join, so we try to get the bracket from the enemy teams dudes
+	if bracket ~= 2 or bracket ~= 3 or bracket ~= 5 then
+		for k,v in pairs(self.combatans.dudes) do
+			if (v.team == 2 and v.player == true) then
+				bracket = bracket + 1
+			end
+		end
+	end
 	self.bracket = bracket
 end
 
