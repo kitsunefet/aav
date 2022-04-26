@@ -1,4 +1,4 @@
-﻿AAV_CombatText = {}
+AAV_CombatText = {}
 AAV_CombatText.__index = AAV_CombatText
 
 function AAV_CombatText:new(parent, team, type, amount, crit)

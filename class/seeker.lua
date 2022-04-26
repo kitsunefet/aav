@@ -1,4 +1,4 @@
-﻿Seeker = {}
+Seeker = {}
 Seeker.__index = Seeker;
 
 function Seeker:new(parent)

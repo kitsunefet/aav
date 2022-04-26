@@ -1,4 +1,4 @@
-﻿AAV_Interrupt = {}
+AAV_Interrupt = {}
 AAV_Interrupt.__index = AAV_Interrupt
 
 function AAV_Interrupt:new()
@@ -8,4 +8,4 @@ function AAV_Interrupt:new()
 	return self
 end
 
-print("RUFL")
+--print("RUFL") -- wtf?

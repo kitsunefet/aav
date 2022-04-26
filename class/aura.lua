@@ -1,4 +1,4 @@
-﻿AAV_Aura = {}
+AAV_Aura = {}
 AAV_Aura.__index = AAV_Aura
 
 function AAV_Aura:new(parent, spellid, type, pos, duration)

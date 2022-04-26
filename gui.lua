@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 local Player
 
 function createPlayerFrame(num)

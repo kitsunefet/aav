@@ -1,4 +1,4 @@
-﻿AAV_PlayerEntity = {}
+AAV_PlayerEntity = {}
 AAV_PlayerEntity.__index = AAV_PlayerEntity
 
 function AAV_PlayerEntity:new(parent, v, y, maxhp)

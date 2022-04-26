@@ -1,4 +1,4 @@
-﻿
+
 local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
 
 AAV_TableGui = {}
@@ -319,6 +319,7 @@ function AAV_TableGui:determineMatchSummary(num)
 	local teamOne, teamTwo = {}, {}
 	for k ,v in pairs(teamdata) do
 		local team = k+1
+		local i = 1
 		for c,w in pairs(matchdata) do
 			if (w.player == true and w.team == team) then
 				if (w.class) then
@@ -327,9 +328,9 @@ function AAV_TableGui:determineMatchSummary(num)
 					idSortStr = "   " .. w.name .. c
 				end
 				if (w.ddone > w.hdone) then
-					idSortStr = "DAMAGER".. idSortStr
+					idSortStr = "DAMAGER".. idSortStr .. i
 				else
-					idSortStr = "HEALER" .. idSortStr
+					idSortStr = "HEALER" .. idSortStr .. i
 				end
 				if (team == 1) then
 					teamOne[idSortStr] = w
@@ -337,6 +338,7 @@ function AAV_TableGui:determineMatchSummary(num)
 					teamTwo[idSortStr] = w
 				end
 			end
+			i = i + 1
 		end
 	end
 

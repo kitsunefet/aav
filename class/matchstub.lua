@@ -1,4 +1,4 @@
-﻿AAV_MatchStub = {}
+AAV_MatchStub = {}
 AAV_MatchStub.__index = AAV_MatchStub
 
 -- @param b bracket
@@ -60,23 +60,29 @@ function AAV_MatchStub:saveToVariable(matchid)
 end
 
 ----
--- sets the bracket according to the dudes data.
+-- sets the bracket according to the dudes data (no of players per team. both teams are checked, higher value is returned)
 function AAV_MatchStub:setBracket()
 	local bracket = 0
+	local teamOnePlayerCount = 0
+	local teamTwoPlayerCount = 0
 	for k,v in pairs(self.combatans.dudes) do
+		-- get player count of team one
 		if (v.team == 1 and v.player == true) then
-			bracket = bracket + 1
+			teamOnePlayerCount = teamOnePlayerCount + 1
+		end
+		-- get player count of team two
+		if (v.team == 2 and v.player == true) then
+			teamTwoPlayerCount = teamTwoPlayerCount + 1
 		end
 	end
-	-- if bracket is not 2, 3 or 5, someone of our team did not join, so we try to get the bracket from the enemy teams dudes
-	if bracket ~= 2 or bracket ~= 3 or bracket ~= 5 then
-		for k,v in pairs(self.combatans.dudes) do
-			if (v.team == 2 and v.player == true) then
-				bracket = bracket + 1
-			end
-		end
-	end
+	-- set whichever is higher
+	bracket = math.max(teamOnePlayerCount, teamTwoPlayerCount)
 	self.bracket = bracket
+	if AAV_DEBUG_MODE then
+		print("teamOnePlayerCount MatchStub: " .. teamOnePlayerCount)
+		print("teamTwoPlayerCount MatchStub: " .. teamTwoPlayerCount)
+		print("bracket MatchStub: " .. bracket)
+	end
 end
 
 

@@ -1,4 +1,4 @@
-﻿
+
 local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
 
 AAV_Gui = {}
@@ -93,12 +93,17 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 end
 
 function AAV_Gui:setPlayerFrameSize(frame, bracket)
-	-- set size for cases where bracket size could not be determined safely, so we guess the size here
+	-- set size for cases where bracket size could not be determined safely, so we guess the size here as a fallback
+	-- 0 or 1 players assumes 2v2 bracket
+	-- 2 players is fine
+	-- 3 players is fine
+	-- 4 players assumes 5v5 bracket
+	-- 5 players is fine
 	if bracket == 0 or bracket == 1 then
 		frame:SetHeight(110 + (AAV_GUI_VERTICALFRAMEDISTANCE * 2))
 	elseif bracket == 4 then
 		frame:SetHeight(110 + (AAV_GUI_VERTICALFRAMEDISTANCE * 5))
-	else
+	else -- no guessing if its valid values (2, 3 or 5 obviously)
 		frame:SetHeight(110 + (AAV_GUI_VERTICALFRAMEDISTANCE * tonumber(bracket))) -- all other cases (this could still be wrong e.g. only 3 out of 5 ppl joined, so we calculated 3 as bracket size)
 	end
 	
@@ -452,9 +457,9 @@ end
 
 function AAV_Gui:createTeamHead(parent, posY, team)
 
-	if AAV_DEBUG_MODE then
-		print("AAV_GUI:createTeamHead")
-	end
+	-- if AAV_DEBUG_MODE then
+	-- 	print("AAV_GUI:createTeamHead")
+	-- end
 	
 	local head = parent:CreateFontString("$parentName", "ARTWORK", "GameFontNormal")
 	head:SetFont("Fonts\\FRIZQT__.TTF", 20, "OUTLINE")

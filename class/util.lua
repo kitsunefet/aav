@@ -1,4 +1,4 @@
-﻿AAV_Util = {}
+AAV_Util = {}
 AAV_Util.__index = AAV_Util
 
 ----

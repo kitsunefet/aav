@@ -1,4 +1,4 @@
-﻿MenuClass = {}
+MenuClass = {}
 MenuClass.__index = MenuClass;
 
 function MenuClass:New()

@@ -1,4 +1,4 @@
-﻿
+
 local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
 
 AAV_PlayStub = {}
@@ -737,24 +737,32 @@ function AAV_PlayStub:removeAllAuras(id)
 end
 
 ----
--- returns the current bracket size according to the dudes data.
+-- sets the bracket according to the dudes data (no of players per team. both teams are checked, higher value is returned)
 -- @return bracket size
 function AAV_PlayStub:getCurrentBracket()
 	local bracket = 0
+	local teamOnePlayerCount = 0
+	local teamTwoPlayerCount = 0
 	if (self.data and self.data.combatans and self.data.combatans.dudes) then
+		-- get player count of team one
 		for k,v in pairs(self.data.combatans.dudes) do
-			if (v.player and v.team == 1) then
-				bracket = bracket + 1
+			-- get player count of team one
+			if (v.team == 1 and v.player == true) then
+				teamOnePlayerCount = teamOnePlayerCount + 1
+			end
+			-- get player count of team two
+			if (v.team == 2 and v.player == true) then
+				teamTwoPlayerCount = teamTwoPlayerCount + 1
 			end
 		end
 	end
-	-- if bracket is not 2, 3 or 5, someone of our team did not join, so we try to get the bracket from the enemy teams dudes
-	if bracket ~= 2 or bracket ~= 3 or bracket ~= 5 then
-		for k,v in pairs(self.data.combatans.dudes) do
-			if (v.team == 2 and v.player == true) then
-				bracket = bracket + 1
-			end
-		end
+	
+	-- return whichever is higher
+	bracket = math.max(teamOnePlayerCount, teamTwoPlayerCount)
+	if AAV_DEBUG_MODE then
+		print("teamOnePlayerCount PlayStub: " .. teamOnePlayerCount)
+		print("teamTwoPlayerCount PlayStub: " .. teamTwoPlayerCount)
+		print("bracket PlayStub: " .. bracket)
 	end
 	return bracket
 end
@@ -871,9 +879,9 @@ function AAV_PlayStub:handleIndexCreation(val)
 end
 
 function AAV_PlayStub:createStats(teamdata, matchdata, bracket)
-	if AAV_DEBUG_MODE then
-		print("createStats") -- debug
-	end
+	-- if AAV_DEBUG_MODE then
+	-- 	print("createStats") -- debug
+	-- end
 	self.pool.stats = {} -- kind of a hack to re-align team-name position in stats frame
 	local num = 1
 	if (#self.pool.stats == 0) then -- if empty

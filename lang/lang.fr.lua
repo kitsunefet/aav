@@ -1,4 +1,4 @@
-﻿local L = LibStub("AceLocale-3.0"):NewLocale("atroxArenaViewer", "frFR")
+local L = LibStub("AceLocale-3.0"):NewLocale("atroxArenaViewer", "frFR")
 
 if not L then return end
 

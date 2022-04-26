@@ -1,4 +1,4 @@
-﻿AAV_Cooldown = {}
+AAV_Cooldown = {}
 AAV_Cooldown.__index = AAV_Cooldown
 
 function AAV_Cooldown:new(parent, spellid, duration, entity, entry)

@@ -1,11 +1,11 @@
-﻿AAV_TeamStats = {}
+AAV_TeamStats = {}
 AAV_TeamStats.__index = AAV_TeamStats
 
 function AAV_TeamStats:new(parent, teamdata, matchdata, team, bracket)
 
-	if AAV_DEBUG_MODE then
-		print("AAV_TeamStats:new") -- debug
-	end
+	-- if AAV_DEBUG_MODE then
+	-- 	print("AAV_TeamStats:new") -- debug
+	-- end
 	local self = {}
 	setmetatable(self, AAV_TeamStats)
 
@@ -63,7 +63,9 @@ function AAV_TeamStats:setValue(parent, teamdata, matchdata, team, bracket)
 			
 			if (teamdata.diff and teamdata.diff >= 0) then 
 				diff = "+" .. teamdata.diff
-			else 
+			elseif (teamdata.diff == nil) then
+				diff = 0
+			else
 				diff = teamdata.diff
 			end
 

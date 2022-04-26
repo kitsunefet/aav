@@ -1,4 +1,4 @@
-﻿
+
 atroxArenaViewer = LibStub("AceAddon-3.0"):NewAddon("atroxArenaViewer", "AceComm-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceSerializer-3.0")
 
 local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 1
+AAV_VERSIONBUGFIX = 2
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -630,6 +630,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			message["std"].state = nil
 		--]]
 		if (atroxArenaViewerData.current.broadcast and status == 1 and currentstate ~= 2) then
+			-- if AAV_DEBUG_MODE then
+			-- 	print("DEBUG: Broadcast...")
+			-- end
 			currentstate = 2
 			message["std"] = {
 				event = AAV_COMM_EVENT["cmd_status"],
@@ -641,7 +644,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			message["std"].state = nil
 			
 		elseif (status == 1 and atroxArenaViewerData.current.inArena) then
-		
+			-- if AAV_DEBUG_MODE then
+			-- 	print("DEBUG: I got here while still broadcasting...")
+			-- end
 			local arenaPlayers = GetNumBattlefieldScores()  -- Number of participant scores available in the current battleground; 0 if not in a battleground (number)
 			local playerName = GetUnitName("player", false)
 			local IsActiveBattlefieldArena,GetBattlefieldWinner,GetBattlefieldTeamInfo
@@ -658,15 +663,20 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 
 			if (battlefieldWinnerTeam == nil) then
 				-- sometires the event is fired (updates?) within arena, so just return
+				-- if AAV_DEBUG_MODE then
+				-- 	print("ERROR: Something is broken")
+				-- end
 				return
 			end
-			
 			for j=1, arenaPlayers do
 				local name, killingBlows, honorableKills, deaths, honorGained, faction, _, race, class, classToken, damageDone, healingDone, _, _, _, _, _ = GetBattlefieldScore(j);
    				-- original: local name, killingBlows, honorableKills, deaths, honorGained, faction, race, class, classToken, damageDone, healingDone, bgRating, ratingChange, preMatchMMR, mmrChange, talentSpec = GetBattlefieldScore(index)
 			    -- no some fields are always 0 or nil, no idea what that field between faction and race represents
 				-- bgRating, ratingChange, preMatchMMR, mmrChange, talentSpec fields (as per API documentation) do not exist in TBC (they return nil)
-		
+				-- if AAV_DEBUG_MODE then
+				-- 	print("DEBUG: I also got here...")
+				-- end
+
 				if(name == nil) then
 					name = "player " .. j -- dirty fix, maybe not needed
 				else
@@ -683,20 +693,41 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 
 					-- print('playerTeamColor:' .. playerTeamColor) -- debug
-
 					-- check if we won
 					if battlefieldWinnerTeam == playerTeamFaction then
-						-- print("I think we won") -- debug
+						-- if AAV_DEBUG_MODE then
+						-- 	print("I think we won") -- debug
+						-- 	print("rated: " .. tostring(isRatedArena)) -- debug
+						-- 	print("unrated: " .. tostring(isUnratedArena)) -- debug
+						-- end
 						M:setResult(1)
 					else
-						-- print("I think we lost") -- debug
+						-- if AAV_DEBUG_MODE then
+						-- 	print("I think we lost") -- debug
+						-- 	print("rated: " .. tostring(isRatedArena)) -- debug
+						-- 	print("unrated: " .. tostring(isUnratedArena)) -- debug
+						-- end
 						M:setResult(2)
 					end
+					
+					-- TODO: need to fix a bug where both are false when playing unrated arena while broadcasting (don't know what causes this)
+					-- below fix would work in skirmishes, breaks rates games, because this code is triggered twice and the second time, both are always false
+					-- if AAV_DEBUG_MODE then
+					-- 	print("isRated:") -- debug message
+					-- 	print(isRatedArena)
+					-- 	print("isUnRated:") -- debug message
+					-- 	print(isUnratedArena)
+					-- end
+					-- if(isRatedArena == false and isUnratedArena == false) then
+					-- 	isUnratedArena = true
+					-- end
 				end
 
 				-- do stuff that only needs to be done once, so just do it while we iterate the player themselves
 				if ((name == playerName) and (isRatedArena)) then
-					--print("rated arena match") -- debug message
+					if AAV_DEBUG_MODE then
+						print("rated arena match") -- debug message
+					end
 
 					-- always set our own team to id 0, even if we were in team ("faction") 1, to make other stuff easier to manage (e.g. sorting columns in matches table)
 					-- enemy team is always set to id 1 for the same reason
@@ -710,12 +741,16 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 					
 					-- further debug messages, got this stuff from the addon !mmr(Match Making Rating), credits to PacMan
-					-- local ChatFrame = _G["ChatFrame"..n]
-					-- ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team
-					-- ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team
+					if AAV_DEBUG_MODE then
+						local ChatFrame = _G["ChatFrame"..n]
+						ChatFrame:AddMessage("< "..teamName0.." >".." MMR " .. matchMakingRating0.." ("..diff0..")", 189/255, 103/255, 255/255) -- Purple Team
+						ChatFrame:AddMessage("< "..teamName1.." >".." MMR " .. matchMakingRating1.." ("..diff1..")", 255/255, 213/255, 0/255)  -- Gold Team
+					end
 
 				elseif ((name == playerName) and (isUnratedArena) and not (isRatedArena)) then
-					--print("unrated arena match") -- debug message
+					if AAV_DEBUG_MODE then
+						print("unrated arena match") -- debug message
+					end
 					
 					-- same reason to always set own team to id 0 and enemy team to id 1 as for rated games, see comments further above
 					if (faction == 0) then
@@ -732,9 +767,11 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 					
 					-- further debug messages, got this stuff from the addon !mmr(Match Making Rating), credits to PacMan
-					-- local ChatFrame = _G["ChatFrame"..n]
-					-- ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team
-					-- ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team
+					if AAV_DEBUG_MODE then
+						local ChatFrame = _G["ChatFrame"..n]
+						ChatFrame:AddMessage("< "..teamName0.." >".." - skirmish game, no ratings available", 189/255, 103/255, 255/255) -- Purple Team
+						ChatFrame:AddMessage("< "..teamName1.." >".." - skirmish game, no ratings available", 255/255, 213/255, 0/255)  -- Gold Team
+					end
 				end
 					
 				-- original: M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
@@ -744,7 +781,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			end
 			
 			if (atroxArenaViewerData.current.broadcast) then
-				-- print("** Match ended **")
+				if AAV_DEBUG_MODE then
+					print("** Match ended **")
+				end
 				message["stats"] = {
 					event = AAV_COMM_EVENT["cmd_matchend"],
 					match = M:getTeams(),
@@ -795,6 +834,8 @@ function atroxArenaViewer:CHAT_MSG_BG_SYSTEM_NEUTRAL(event, msg)
 				end
 			end
 
+			-- NOTE: at this point we don't have enemy team data yet, so I also moved setBracket to where the game ends and is saved
+			-- right now we set bracket here AND later when the match ended (own team size is best guessed when match started, enemy team size is best guessed when match ended, so this seems like a good idea)
 			M:setBracket() -- sets the bracket size according to dudes data
 			
 			self:handleEvents("register")
@@ -924,6 +965,8 @@ function atroxArenaViewer:ZONE_CHANGED_NEW_AREA(event, unit)
 				
 				atroxArenaViewerData.data[matchid] = atroxArenaViewerData.data[matchid] or {}
 				
+				M:setBracket() -- sets the bracket size according to dudes data
+
 				M:setMatchEnd()
 				M:saveToVariable(matchid)
 			end
@@ -1183,29 +1226,31 @@ end
 -- @param event
 -- @param unit arena1, arena2...
 function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
-	if (UnitIsPlayer(unit)) then
-		if (not M) then return end
-		local sourceGUID = UnitGUID(unit)
-		
-		-- debugging prints
-		if AAV_DEBUG_MODE then
-			print("======== UNIT_NAME_UPDATE DEBUG MESSAGES")
-			print(sourceGUID)
-			print(unit)
-			print(UnitName(unit))
-			print(M:getDudesData())
-			print(M:getDudesData()[sourceGUID].name)
-			-- TODO: sometimes the first line throws an error, check why
-		end
-		if(UnitName(unit)) then
-			M:getDudesData()[sourceGUID].name = UnitName(unit)
-			self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
-		else
-			print("error")
-		end
-		
-		if(strsub(unit, 1, strlen(unit)-1) ~= "raid") then
-			M:SetOpponentSpec(sourceGUID, strsub(unit, strlen(unit)))
+	if atroxArenaViewerData.current.inArena then
+		if (UnitIsPlayer(unit)) then
+			if (not M) then return end
+			local sourceGUID = UnitGUID(unit)
+			
+			-- debugging prints
+			-- if AAV_DEBUG_MODE then
+			-- 	print("======== UNIT_NAME_UPDATE DEBUG MESSAGES")
+			-- 	print(sourceGUID)
+			-- 	print(unit)
+			-- 	print(UnitName(unit))
+			-- 	print(M:getDudesData())
+			-- 	print(M:getDudesData()[sourceGUID].name)
+			-- 	-- TODO: sometimes the first line throws an error, check why
+			-- end
+			if(UnitName(unit)) then
+				M:getDudesData()[sourceGUID].name = UnitName(unit)
+				self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
+			else
+				print("AAV: error UNIT_NAME_UPDATE")
+			end
+			
+			if(strsub(unit, 1, strlen(unit)-1) ~= "raid") then
+				M:SetOpponentSpec(sourceGUID, strsub(unit, strlen(unit)))
+			end
 		end
 	end
 end
@@ -1422,20 +1467,20 @@ function atroxArenaViewer:getNewMatchID()
 	return max + 1
 end
 
---[[
+
 -- removed in 4.0.3
-function atroxArenaViewer:getCurrentBracket()
-	currentbracket = nil
-	for i=1,2 do
-		local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
-		if (status == "active" and teamSize > 0) then
-			currentbracket = teamSize
-			break
-		end
-	end
-	return currentbracket
-end
---]]
+-- function atroxArenaViewer:getCurrentBracket()
+-- 	currentbracket = nil
+-- 	for i=1,2 do
+-- 		local status, _, _, _, _, teamSize = GetBattlefieldStatus(i)
+-- 		if (status == "active" and teamSize > 0) then
+-- 			currentbracket = teamSize
+-- 			break
+-- 		end
+-- 	end
+-- 	return currentbracket
+-- end
+
 
 function atroxArenaViewer:getCurrentTime()
 	return date("%m/%d/%y %H:%M:%S")

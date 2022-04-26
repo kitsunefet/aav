@@ -1,4 +1,4 @@
-﻿
+
 local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
 
 -- Slash commands

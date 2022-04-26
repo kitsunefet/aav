@@ -1,4 +1,4 @@
-﻿AAV_UsedSkill = {}
+AAV_UsedSkill = {}
 AAV_UsedSkill.__index = AAV_UsedSkill
 
 function AAV_UsedSkill:new(parent, spellid, cast, num, v)

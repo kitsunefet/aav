@@ -1,4 +1,4 @@
-﻿AAV_Crowd = {}
+AAV_Crowd = {}
 AAV_Crowd.__index = AAV_Crowd
 
 function AAV_Crowd:new(parent, id)
