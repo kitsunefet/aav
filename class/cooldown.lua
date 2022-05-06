@@ -15,6 +15,11 @@ end
 
 function AAV_Cooldown:setValue(parent, spellid, duration, entity, entry)
 	local name, _, icon = GetSpellInfo(spellid)
+	-- pvp trinket icon override to alliance insignia
+	-- FOR THE ALLIANCE!
+	if spellid == 42292 then
+		icon = 133452
+	end
 	
 	self.parent = parent
 	self.spellid = spellid

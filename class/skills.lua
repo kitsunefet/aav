@@ -25,6 +25,11 @@ function AAV_UsedSkill:setValue(parent, spellid, cast, num, v)
 	if (name == nil) then
 		return
 	end
+	-- pvp trinket icon override to alliance insignia
+	-- FOR THE ALLIANCE!
+	if spellid == 42292 then
+		icon = 133452
+	end
 	
 	self.spellid = spellid
 	self.cast = cast

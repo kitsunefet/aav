@@ -759,11 +759,11 @@ function AAV_PlayStub:getCurrentBracket()
 	
 	-- return whichever is higher
 	bracket = math.max(teamOnePlayerCount, teamTwoPlayerCount)
-	if AAV_DEBUG_MODE then
-		print("teamOnePlayerCount PlayStub: " .. teamOnePlayerCount)
-		print("teamTwoPlayerCount PlayStub: " .. teamTwoPlayerCount)
-		print("bracket PlayStub: " .. bracket)
-	end
+	-- if AAV_DEBUG_MODE then
+	-- 	print("teamOnePlayerCount PlayStub: " .. teamOnePlayerCount)
+	-- 	print("teamTwoPlayerCount PlayStub: " .. teamTwoPlayerCount)
+	-- 	print("bracket PlayStub: " .. bracket)
+	-- end
 	return bracket
 end
 

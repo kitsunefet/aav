@@ -78,11 +78,11 @@ function AAV_MatchStub:setBracket()
 	-- set whichever is higher
 	bracket = math.max(teamOnePlayerCount, teamTwoPlayerCount)
 	self.bracket = bracket
-	if AAV_DEBUG_MODE then
-		print("teamOnePlayerCount MatchStub: " .. teamOnePlayerCount)
-		print("teamTwoPlayerCount MatchStub: " .. teamTwoPlayerCount)
-		print("bracket MatchStub: " .. bracket)
-	end
+	-- if AAV_DEBUG_MODE then
+	-- 	print("teamOnePlayerCount MatchStub: " .. teamOnePlayerCount)
+	-- 	print("teamTwoPlayerCount MatchStub: " .. teamTwoPlayerCount)
+	-- 	print("bracket MatchStub: " .. bracket)
+	-- end
 end
 
 

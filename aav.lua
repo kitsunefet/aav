@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 2
+AAV_VERSIONBUGFIX = 3
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -1000,6 +1000,7 @@ function atroxArenaViewer:handleEvents(val)
 		self:RegisterEvent("UNIT_POWER_UPDATE") 
 		self:RegisterEvent("ARENA_OPPONENT_UPDATE")
 		--self:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
+		self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 		self:RegisterEvent("UNIT_NAME_UPDATE")
 		self:RegisterEvent("UNIT_AURA")
 		atroxArenaViewerData.current.inFight = true
@@ -1012,6 +1013,7 @@ function atroxArenaViewer:handleEvents(val)
 		self:UnregisterEvent("UNIT_POWER_UPDATE") 
 		self:UnregisterEvent("ARENA_OPPONENT_UPDATE")
 		--self:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
+		self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 		self:UnregisterEvent("UNIT_NAME_UPDATE")
 		self:UnregisterEvent("UNIT_AURA")
 		atroxArenaViewerData.current.inFight = false
@@ -1293,6 +1295,45 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_SCORE(event, unit)
 	
 end
 --]]
+
+-- Needed to track PvP trinkets and possibly other spells that do not show up in COMBAT_LOG_EVENT_UNFILTERED
+-- may fire multiple times for the same spell with different units (player, target, party1, raid1, etc., ...) so we filter some duplicates
+-- looks like enemies are best tracked as arena1, arena2 etc
+-- looks like own team is best tracked as raid1, raid2 etc
+-- got the idea how to handle this from Omnibar, credits to Omnibars developer!
+function atroxArenaViewer:UNIT_SPELLCAST_SUCCEEDED(event,unit,_,spellid)
+
+	-- filter spell event from player (self), because we also get an event from raid1/party1 etc.
+	-- filter spell event from target, because we also get an event from raid1/party1/arena1 etc.
+	-- TODO: check if party1 etc can be safely removed as duplicates from raid1 etc, or if we're missing trinkets then
+	if (unit == "player") or (unit == "target") or (string.find(unit, "nameplate")) or (string.find(unit, "party")) then
+		return
+	end
+
+	-- PvP Trinket
+	if spellid == 42292 then
+		
+		local eventType = 10
+		local dest = -1
+		local source = M:getGUIDtoNumber(UnitGUID(unit))
+		if (not source) then source = 0 end
+		local time = 0
+
+		if AAV_DEBUG_MODE then
+			-- print("--aav message:")
+			-- print(self:getDiffTime())
+			-- print(eventType)
+			-- print(source)
+			-- print(dest)
+			-- print(spellid)
+			-- print(time)
+			print("-- unit used pvp trinket --")
+			print(GetUnitName(unit, true))
+			print(unit)
+		end
+		self:createMessage(self:getDiffTime(), eventType .. "," .. source .. "," .. dest .. "," .. spellid .. "," .. time)
+	end
+end
 
 function atroxArenaViewer:COMBAT_LOG_EVENT_UNFILTERED(event)
 	atroxArenaViewer:COMBAT_LOG_EVENT_ORIGINAL(event, CombatLogGetCurrentEventInfo() )
