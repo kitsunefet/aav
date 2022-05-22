@@ -1187,12 +1187,21 @@ function AAV_PlayStub:createIndexCycle()
 				if (tonumber(s[5]) == 1) then
 					if (not self.calc.buff[id]) then self.calc.buff[id] = {} end
 					-- save spellid (s[4] and #stacks (s[7]) with a seperator (/), we'll need to split that info apart in some parts of the code but this way we just have one table of buffs with all the info per line)
-					table.insert(self.calc.buff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
+					if tonumber(s[7]) ~= nil then
+						table.insert(self.calc.buff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
+					else
+						table.insert(self.calc.buff[id], tonumber(s[4])) -- backwards compatibility for old match data without #stacks
+					end
+					
 				-- debuff
 				elseif (tonumber(s[5]) == 2) then
 					if (not self.calc.debuff[id]) then self.calc.debuff[id] = {} end
 					-- save spellid (s[4] and #stacks (s[7]) with a seperator (/), we'll need to split that info apart in some parts of the code but this way we just have one table of debuffs with all the info per line)
-					table.insert(self.calc.debuff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
+					if tonumber(s[7]) ~= nil then
+						table.insert(self.calc.debuff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
+					else
+						table.insert(self.calc.debuff[id], tonumber(s[4]))
+					end
 				end
 				
 				if ((tonumber(s[5]) == 1 or tonumber(s[5]) == 2) and tonumber(s[6]) > 0) then
@@ -1206,22 +1215,36 @@ function AAV_PlayStub:createIndexCycle()
 				-- buff
 				if (tonumber(s[5]) == 1 and self.calc.buff[id]) then
 					for c,w in pairs(self.calc.buff[id]) do
-						local temp = {} 
-						temp = AAV_Util:split(w, "/") -- split buff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
-						if (tonumber(s[4]) == tonumber(temp[1])) then
-							table.remove(self.calc.buff[id], c)
-							break
+						if string.find(w, "/") then
+							local temp = {} 
+							temp = AAV_Util:split(w, "/") -- split buff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
+							if (tonumber(s[4]) == tonumber(temp[1])) then
+								table.remove(self.calc.buff[id], c)
+								break
+							end
+						else -- backwards compatibility for old match data without #stacks
+							if (tonumber(s[4]) == tonumber(w)) then
+								table.remove(self.calc.buff[id], c)
+								break
+							end
 						end
 					end
 					
 				-- debuff
 				elseif (tonumber(s[5]) == 2 and self.calc.debuff[id]) then
 					for c,w in pairs(self.calc.debuff[id]) do
-						local temp = {} 
-						temp = AAV_Util:split(w, "/") -- split debuff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
-						if (tonumber(s[4]) == tonumber(temp[1])) then
-							table.remove(self.calc.debuff[id], c)
-							break
+						if string.find(w, "/") then
+							local temp = {} 
+							temp = AAV_Util:split(w, "/") -- split debuff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
+							if (tonumber(s[4]) == tonumber(temp[1])) then
+								table.remove(self.calc.debuff[id], c)
+								break
+							end
+						else -- backwards compatibility for old match data without #stacks
+							if (tonumber(s[4]) == tonumber(w)) then
+								table.remove(self.calc.debuff[id], c)
+								break
+							end
 						end
 					end
 				end
