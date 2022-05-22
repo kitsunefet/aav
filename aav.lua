@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 3
+AAV_VERSIONBUGFIX = 4
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -1173,32 +1173,72 @@ function atroxArenaViewer:UNIT_AURA(event, unit)
 	if (not id) then return end
 	
 	for n = 1, 40 do
-		-- local _, _, _, _, _, btime, _, _, _, _, bspellid = UnitBuff(unit, n)
-		-- local _, _, _, _, _, dtime, _, _, _, _, dspellid = UnitDebuff(unit, n)
-		local _, _, _, _, btime, _, _, _, _, bspellid = UnitBuff(unit, n)
-		local _, _, _, _, dtime, _, _, _, _, dspellid = UnitDebuff(unit, n)
+		local bname, _, bstacks, _, btime, _, _, _, _, bspellid = UnitBuff(unit, n)
+		local dname, _, dstacks, _, dtime, _, _, _, _, dspellid = UnitDebuff(unit, n)
 
 		if (not bspellid and not dspellid) then break end
 		
 		if (bspellid) then tempbuffs[bspellid] = true end
 		if (dspellid) then tempdebuffs[dspellid] = true end
 		
+
+		-- new buffs/debuffs
 		if (bspellid and not M:getBuffs(id)[bspellid]) then
 			-- create new buff
 			M:getBuffs(id)[bspellid] = true
 			
 			if (not btime) then btime = 0 end
-			self:createMessage(self:getDiffTime(), "13," .. id .. "," .. bspellid .. ",1," .. btime)
+			-- if AAV_DEBUG_MODE then
+			-- 	print("buff spell: " .. bname)
+			-- 	--print("buff spellid: " .. bspellid)
+			-- 	print("bstacks: " .. bstacks)
+			-- end
+			self:createMessage(self:getDiffTime(), "13," .. id .. "," .. bspellid .. ",1," .. btime .. "," .. bstacks)
 		end
 		if (dspellid and not M:getDebuffs(id)[dspellid]) then
 			-- create new debuff
 			M:getDebuffs(id)[dspellid] = true
 			
 			if (not dtime) then dtime = 0 end
-			self:createMessage(self:getDiffTime(), "13," .. id .. "," .. dspellid .. ",2," .. dtime)
+			-- if AAV_DEBUG_MODE then
+			-- 	print("debuff spell: " .. dname)
+			-- 	print("debuff spellid: " .. dspellid)
+			-- 	print("dstacks: " .. dstacks)
+			-- 	print("---")
+			-- end
+			self:createMessage(self:getDiffTime(), "13," .. id .. "," .. dspellid .. ",2," .. dtime .. "," .. dstacks)
+		end
+
+		-- buff/debuff update (already exists = refreshed, stacks changed, ...)
+		if (bspellid and M:getBuffs(id)[bspellid]) then
+			-- update buff
+			M:getBuffs(id)[bspellid] = true -- TODO: do we need this for update events?
+			
+			if (not dtime) then dtime = 0 end
+			-- if AAV_DEBUG_MODE then
+			-- 	print("update debuff spell: " .. dname)
+			-- 	print("update debuff spellid: " .. dspellid)
+			-- 	print("update dstacks: " .. dstacks)
+			-- 	print("---")
+			-- end
+			self:createMessage(self:getDiffTime(), "15," .. id .. "," .. bspellid .. ",1," .. btime .. "," .. bstacks)
+		end
+		if (dspellid and M:getDebuffs(id)[dspellid]) then
+			-- update debuff
+			M:getDebuffs(id)[dspellid] = true -- TODO: do we need this for update events?
+			
+			if (not dtime) then dtime = 0 end
+			-- if AAV_DEBUG_MODE then
+			-- 	print("update debuff spell: " .. dname)
+			-- 	print("update debuff spellid: " .. dspellid)
+			-- 	print("update dstacks: " .. dstacks)
+			-- 	print("---")
+			-- end
+			self:createMessage(self:getDiffTime(), "15," .. id .. "," .. dspellid .. ",2," .. dtime .. "," .. dstacks)
 		end
 	end
 	
+	-- buffs/debuffs ran out
 	for k,v in pairs(M:getBuffs(id)) do
 		if (not tempbuffs[k]) then
 			--remove
@@ -1303,12 +1343,16 @@ end
 -- got the idea how to handle this from Omnibar, credits to Omnibars developer!
 function atroxArenaViewer:UNIT_SPELLCAST_SUCCEEDED(event,unit,_,spellid)
 
-	-- filter spell event from player (self), because we also get an event from raid1/party1 etc.
-	-- filter spell event from target, because we also get an event from raid1/party1/arena1 etc.
+	-- filter out spell event from player (self), because we also get an event from raid1/party1 etc.
+	-- filter out spell event from target, because we also get an event from raid1/party1/arena1 etc.
 	-- TODO: check if party1 etc can be safely removed as duplicates from raid1 etc, or if we're missing trinkets then
 	if (unit == "player") or (unit == "target") or (string.find(unit, "nameplate")) or (string.find(unit, "party")) then
 		return
 	end
+	-- INFO: other possible solution used in other functions, needs testing tho:
+	-- local sub = string.sub(unit,1,4)
+	-- if (sub ~= "raid" and sub ~= "aren") then return end
+
 
 	-- PvP Trinket
 	if spellid == 42292 then
@@ -1436,6 +1480,7 @@ function atroxArenaViewer:COMBAT_LOG_EVENT_ORIGINAL(event, ...)
 			self:createMessage(self:getDiffTime(), eventType .. "," .. source .. "," .. dest .. "," .. spellId .. "," .. amount)
 		end
 	elseif (type == "SPELL_AURA_APPLIED") then
+		-- INFO: events 13 (aura applied), 14 (aura removed) and 15 (aura update) are handled in atroxArenaViewer:UNIT_AURA event
 		--[[
 		eventType = 13
 		if (source and dest) then
@@ -1463,6 +1508,7 @@ function atroxArenaViewer:COMBAT_LOG_EVENT_ORIGINAL(event, ...)
 		end
 		--]]
 	elseif (type == "SPELL_AURA_REMOVED") then
+		-- INFO: events 13 (aura applied), 14 (aura removed) and 15 (aura update) are handled in atroxArenaViewer:UNIT_AURA event
 		--[[
 		eventType = 14
 		if (source and dest) then
@@ -1471,7 +1517,14 @@ function atroxArenaViewer:COMBAT_LOG_EVENT_ORIGINAL(event, ...)
 		end
 		--]]
 	elseif (type == "SPELL_AURA_REFRESH") then
+		-- INFO: events 13 (aura applied), 14 (aura removed) and 15 (aura update) are handled in atroxArenaViewer:UNIT_AURA event
 		eventType = 15
+		-- if AAV_DEBUG_MODE then
+		-- 	print("SPELL AURA REFRESH EVENT:")
+		-- 	print(dest)
+		-- 	print(spellId)
+		-- 	print("---")
+		-- end
 		--[[
 		if (source and dest) then
 			if (amount == "BUFF") then amount = 1 else amount = 2 end -- buffs = 1, debuffs = 2
@@ -1722,6 +1775,16 @@ end
 
 
 function atroxArenaViewer:executeMatchData(tick, data)
+	--[[ 
+	INFO: other fields depend in the event type (t), so maybe it's not possible to document all possible combinations here..
+	data[1] = timer/timestamp
+	data[2] = t = event type
+	data[3] =
+	data[4] =
+	data[5] =
+	data[6] =
+	data[7] =
+	--]]
 	local t = tonumber(data[2])
 	
 	-- init
@@ -1792,8 +1855,12 @@ function atroxArenaViewer:executeMatchData(tick, data)
 		
 	elseif (t == 13) then
 		-- spell_aura_applied
-		T:addAura(tonumber(data[3]), tonumber(data[4]), tonumber(data[5]))
-		--print("aura_applied ".. tonumber(data[4]).. " ".. data[6])
+		T:addAura(tonumber(data[3]), tonumber(data[4]), tonumber(data[5]), tonumber(data[6]), tonumber(data[7]))
+		-- if AAV_DEBUG_MODE then
+		-- 	-- INFO: data[3] = playerID, data[4] = spellID, data[5] = 1 or 2 (buff/debuff), data[6] = duration, data[7] = #stacks
+		-- 	print("aura_applied ".. tonumber(data[3]) .. ", " .. tonumber(data[4]).. ", ".. tonumber(data[5]) .. ", " .. tonumber(data[6]) .. ", " .. tonumber(data[7]))
+		-- end
+		-- TODO: this may be the place where timers for buffs/debuffs could also be added, because we already got the duration in the data
 		if (data[6] and tonumber(data[6]) > 0 and AAV_IMPORTANTSKILLS[tonumber(data[4])]) then
 			T:addCC(tonumber(data[3]), tonumber(data[4]), tonumber(data[6]), AAV_IMPORTANTSKILLS[tonumber(data[4])])
 		end
@@ -1811,13 +1878,16 @@ function atroxArenaViewer:executeMatchData(tick, data)
 		
 	elseif (t == 15) then
 		-- spell_aura_refreshed
-		
+		-- TODO: maybe this could be optimized with a T:updateAura function
+		T:removeAura(tonumber(data[3]), tonumber(data[4]), tonumber(data[5]))
+		T:addAura(tonumber(data[3]), tonumber(data[4]), tonumber(data[5]), tonumber(data[6]), tonumber(data[7]))
 	elseif (t == 16) then
 		-- died
 		-- T:setVisibility(tonumber(data[3]), 4)
 		
 	elseif (t == 17) then
 		-- mana changes
+		-- TODO: not working, needs further analysis
 		T:setMana(tonumber(data[3]), tonumber(data[4]))
 		
 	elseif (t == 18) then

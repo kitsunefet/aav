@@ -632,7 +632,7 @@ function AAV_Gui:createUsedSkill(parent, i)
 	return f, b, tar, tc
 end
 
-function AAV_Gui:createAura(parent, i)
+function AAV_Gui:createAura(parent, stacks)
 	local f = CreateFrame("Frame", "$parentAura", parent)
 	f:SetWidth(AAV_USEDSKILL_ICONBUFFSIZE)
 	f:SetHeight(AAV_USEDSKILL_ICONBUFFSIZE)
@@ -642,6 +642,20 @@ function AAV_Gui:createAura(parent, i)
 	local t = f:CreateTexture(nil)
 	t:SetAllPoints(f)
 	f.texture = t
+
+	-- stacks
+	
+	local n = f:CreateFontString("$parentName", "ARTWORK", "GameFontNormal")
+	
+	n:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+	n:SetJustifyH("LEFT")
+	if stacks and stacks > 0 then
+		n:SetText(stacks)
+	else
+		n:SetText()
+	end
+	n:SetPoint("BOTTOMLEFT", f, 3, 0)
+	n:Show()
 	
 	return f, n
 	

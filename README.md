@@ -46,11 +46,12 @@ Known Bugs
 * interrupts do not always show ("X") on interrupted spell in play match window
 * sometimes while in arena a LUA error keeps popping up every second, has something to do with spell auras. need to analyze further
 * skirmish games are not recorded properly while broadcasting at the same time
+* Mana bars are not shown
+* Match history gets deleted completely if there is too much saved data (technical limitation which cannot be changed). Will set a max no. of saved matches in a future update to try to prevent this.
 
 Ideas for further improvement (volunteers are very welcome to create pull requests)
 ---
 * detect talent spec by skills that are only available for specific specs (e.g. ice barrier = frost mage)
-* show the amount of stacks of spells on a target (e.g. lifebloom, earth shield, prayer of mending, ...)
 * show the duration of buffs/debuffs on targets (currently only done for CC spells)
 * add pets
 * track pet spells, e.g. felhunter devour magic, hunterpet intimidation

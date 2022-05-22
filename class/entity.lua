@@ -165,14 +165,14 @@ end
 ----
 -- @param spellid
 -- @param type buff = 1, debuff = 2
-function AAV_PlayerEntity:addAura(spellid, type, duration)
+function AAV_PlayerEntity:addAura(spellid, type, duration, stacks)
 	local aura, target, range, n
 	
 	if (type == 1) then target = self.buffs range = self.brange end
 	if (type == 2) then target = self.debuffs range = self.drange end
 	
-	aura = AAV_Aura:new(range, spellid, type, #target, duration)
-	self:setAura(aura, spellid, type)
+	aura = AAV_Aura:new(range, spellid, type, #target, duration, stacks)
+	self:setAura(aura, spellid, type, duration, stacks)
 	
 	if (atroxArenaViewerData.defaults.profile.shortauras and #target > AAV_MAX_AURASVISIBLE) then
 		for k,v in pairs(target) do
@@ -230,7 +230,7 @@ end
 function AAV_PlayerEntity:removeAura(spellid, type)
 	local delete = nil
 	local target, x, dx
-	
+
 	if (type == 1) then target = self.buffs end
 	if (type == 2) then target = self.debuffs end
 	
@@ -248,7 +248,6 @@ end
 ----
 -- removes all auras depending on omitted value.
 function AAV_PlayerEntity:removeAllAuras()
-	
 	for i=1,#self.buffs do
 		self:removeAura(self.buffs[1].spellid, 1)
 	end
@@ -300,9 +299,16 @@ end
 -- @param aura object
 -- @param spellid
 -- @param type buff = 1, debuff = 2
-function AAV_PlayerEntity:setAura(aura, spellid, type)
+function AAV_PlayerEntity:setAura(aura, spellid, type, duration, stacks)
 	local name, _, icon, _, _, _, _ = GetSpellInfo(spellid)
 	local target, parent
+
+	-- TODO: what do we do with duration and stacks here? currently nothing
+	-- if AAV_DEBUG_MODE then
+	-- 	print(spellid)
+	-- 	print(duration)
+	-- 	print(stacks)
+	-- end
 	
 	if (type == 1) then target = self.buffs parent = self.brange end
 	if (type == 2) then target = self.debuffs parent = self.drange end

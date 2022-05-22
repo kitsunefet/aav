@@ -227,6 +227,7 @@ end
 -- creates on the basis of the match member data the GUI bars.
 -- @param f frame parent
 function AAV_PlayStub:newEntities(f)
+
 	local b, c, cr, n, s, txt
 	local dir = {[1]=0, [2]=0}
 	
@@ -446,7 +447,7 @@ function AAV_PlayStub:handleTimer(value)
 end
 
 ----
--- after a seeker jump the values of the entities must be readjusted.
+-- after a seeker jump (clicking on timeline in play match frame) the values of the entities must be readjusted.
 function AAV_PlayStub:reAdjustTypes()
 	-- hp, maxhp
 	local val, cval
@@ -475,25 +476,36 @@ function AAV_PlayStub:reAdjustTypes()
 			self.entities[w.ID]:hideAllAura()
 			self.entities[w.ID]:removeAllAuras(w.ID)
 			self.entities[w.ID]:setOpacity(1)
-			
+
+			-- buff auras
 			val = AAV_Util:split(self:getIndexValue(self:getTick(), w.ID, "buff"), ',')
 			if (val) then 
 				for a,b in pairs(val) do
 					if (not atroxArenaViewerData.defaults.profile.shortauras or (atroxArenaViewerData.defaults.profile.shortauras and #self.entities[w.ID].buffs <= AAV_MAX_AURASVISIBLE)) then
-						self:addAura(w.ID, tonumber(b), 1)
+						local temp = {} 
+						temp = AAV_Util:split(b, "/") -- split buff spellid and # stacks from buff table
+						if (temp ~= nil) then
+							self:addAura(w.ID, tonumber(temp[1]), 1, 0, tonumber(temp[2]))
+						end
 					end
 				end
 			end
 			
+			-- debuffs
 			val = AAV_Util:split(self:getIndexValue(self:getTick(), w.ID, "debuff"), ',')
 			if (val) then
 				for a,b in pairs(val) do
 					if (not atroxArenaViewerData.defaults.profile.shortauras or (atroxArenaViewerData.defaults.profile.shortauras and #self.entities[w.ID].buffs <= AAV_MAX_AURASVISIBLE)) then
-						self:addAura(w.ID, tonumber(b), 2)
+						local temp = {}
+						temp = AAV_Util:split(b, "/") -- split debuff spellid and # stacks from debuff table
+						if (temp ~= nil) then
+							self:addAura(w.ID, tonumber(temp[1]), 2, 0, tonumber(temp[2]))
+						end
 					end
 				end
 			end
-			
+
+			-- crowd control (cc)
 			val = AAV_Util:split(self:getIndexValue(self:getTick(), w.ID, "cc"), ',')
 			if (val) then 
 				for k,v in pairs(val) do 
@@ -503,7 +515,7 @@ function AAV_PlayStub:reAdjustTypes()
 					end
 				end
 			end
-			
+			-- cooldowns (cd)
 			val = AAV_Util:split(self:getIndexValue(self:getTick(), w.ID, "cd"), ',')
 			if (val) then 
 				for k,v in pairs(val) do 
@@ -601,6 +613,12 @@ end
 -- @param targetid target, when -1 then unfilled (AE spells without target)
 -- @param casttime time of cast
 function AAV_PlayStub:addSkillIcon(id, spellid, cast, targetid, casttaim)
+
+	-- if AAV_DEBUG_MODE then
+	-- 	print("add skill icon")
+	-- 	print(spellid)
+	-- 	print(cast)
+	-- end
 	
 	if (not self.entities[id]) then return end
 	casttime = casttaim
@@ -687,8 +705,24 @@ end
 -- @param id playerid
 -- @param spellid
 -- @param type buff = 1, debuff = 2
-function AAV_PlayStub:addAura(id, spellid, type, duration)
+-- @param duration timer for buff/debuff
+-- @param stacks # of stacks, 0 if non stackable buff/debuff
+function AAV_PlayStub:addAura(id, spellid, type, duration, stacks)
 	if (not self.entities[id]) then return end
+
+	-- TODO: may need this debug info to add buff/debuff durations in a future update
+	-- if AAV_DEBUG_MODE then
+	-- 	print("id: ")
+	-- 	print(id)
+	-- 	print("spellid: ")
+	-- 	print(spellid)
+	-- 	print("type: ")
+	-- 	print(type)
+	-- 	print("duration: ")
+	-- 	print(duration)
+	-- 	print("stacks: ")
+	-- 	print(stacks)
+	-- end
 	
 	local aura = nil
 	
@@ -707,12 +741,12 @@ function AAV_PlayStub:addAura(id, spellid, type, duration)
 	
 	-- create new
 	if (not aura) then
-		aura = self.entities[id]:addAura(spellid, type, duration)
+		aura = self.entities[id]:addAura(spellid, type, duration, stacks)
 		table.insert(self.auras, aura)
 		
 		
 	else
-		aura = self.entities[id]:addAura(spellid, type, duration)
+		aura = self.entities[id]:addAura(spellid, type, duration, stacks)
 	end
 end
 
@@ -733,7 +767,9 @@ end
 function AAV_PlayStub:removeAllAuras(id)
 	if (not self.entities[id]) then return end
 	
-	if (self.entities[id]) then self.entities[id]:removeAllAuras() end
+	if (self.entities[id]) then 
+		self.entities[id]:removeAllAuras()
+	end
 end
 
 ----
@@ -1110,7 +1146,7 @@ function AAV_PlayStub:createIndexCycle()
 	--for k,v in pairs(self.data.data) do
 		k = currentCycle
 		v = self.data.data[currentCycle]
-	
+		
 		if (v) then
 			s = AAV_Util:split(v, ',')
 			id = tonumber(s[3])
@@ -1145,29 +1181,34 @@ function AAV_PlayStub:createIndexCycle()
 					self.calc.cd[id][tonumber(s[5])] = AAV_CCSKILS[tonumber(s[5])]
 				end
 				
+			-- aura applied
 			elseif (event == 13) then
-			
 				-- buff
 				if (tonumber(s[5]) == 1) then
 					if (not self.calc.buff[id]) then self.calc.buff[id] = {} end
-					table.insert(self.calc.buff[id], tonumber(s[4]))
-					
+					-- save spellid (s[4] and #stacks (s[7]) with a seperator (/), we'll need to split that info apart in some parts of the code but this way we just have one table of buffs with all the info per line)
+					table.insert(self.calc.buff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
 				-- debuff
 				elseif (tonumber(s[5]) == 2) then
 					if (not self.calc.debuff[id]) then self.calc.debuff[id] = {} end
-					table.insert(self.calc.debuff[id], tonumber(s[4]))
+					-- save spellid (s[4] and #stacks (s[7]) with a seperator (/), we'll need to split that info apart in some parts of the code but this way we just have one table of debuffs with all the info per line)
+					table.insert(self.calc.debuff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
 				end
 				
 				if ((tonumber(s[5]) == 1 or tonumber(s[5]) == 2) and tonumber(s[6]) > 0) then
 					if (not self.calc.cc[id]) then self.calc.cc[id] = {} end
 					self.calc.cc[id][tonumber(s[4])] = tonumber(s[6])
 				end
+
+			-- aura removed / ran out
 			elseif (event == 14) then
-			
+
 				-- buff
 				if (tonumber(s[5]) == 1 and self.calc.buff[id]) then
 					for c,w in pairs(self.calc.buff[id]) do
-						if (tonumber(s[4]) == w) then
+						local temp = {} 
+						temp = AAV_Util:split(w, "/") -- split buff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
+						if (tonumber(s[4]) == tonumber(temp[1])) then
 							table.remove(self.calc.buff[id], c)
 							break
 						end
@@ -1176,7 +1217,9 @@ function AAV_PlayStub:createIndexCycle()
 				-- debuff
 				elseif (tonumber(s[5]) == 2 and self.calc.debuff[id]) then
 					for c,w in pairs(self.calc.debuff[id]) do
-						if (tonumber(s[4]) == w) then
+						local temp = {} 
+						temp = AAV_Util:split(w, "/") -- split debuff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
+						if (tonumber(s[4]) == tonumber(temp[1])) then
 							table.remove(self.calc.debuff[id], c)
 							break
 						end
@@ -1189,7 +1232,7 @@ function AAV_PlayStub:createIndexCycle()
 					end
 				end
 				
-				
+			-- todo: mana not working, needs further analyzing
 			elseif (event == 17) then
 				-- mana
 				if (not self.index[id][k]) then self.index[id][k] = {} end -- c = tick
@@ -1250,7 +1293,7 @@ function AAV_PlayStub:createIndexCycle()
 			end
 			
 			lastticktime = tonumber(s[1])
-			
+		
 		end
 	
 		currentCycle = currentCycle + 1
@@ -1276,7 +1319,7 @@ end
 -- @return last happened value of passed event
 function AAV_PlayStub:getIndexValue(tick, playerid, type)
 	local value, i
-	
+
 	if (self.index[playerid]) then
 		for i = tick, 0, -1 do
 			if (self.index[playerid][i] and self.index[playerid][i][type]) then
