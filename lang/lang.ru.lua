@@ -14,6 +14,8 @@ L.UNKNOWN						= "Неизвестно"
 L.SPEED							= "Скорость"
 L.VIEW_STATS					= "Показать статистику"
 L.VIEW_MATCH					= "Показать матч"
+L.DEL_OLD_MATCHES_1             = "Данные самых старых матчей удалены, нельзя сохранить более"
+L.DEL_OLD_MATCHES_2             = "матчей."
 
 L.CONF_NOMATCHES_FOUND			= "матчи не найдены."
 L.CONF_WRONG_INPUT				= "неправильный ввод."

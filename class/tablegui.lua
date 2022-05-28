@@ -73,6 +73,7 @@ end
 ---
 -- Shows the frames and the matchesTable, and initializes them if they are nil
 function AAV_TableGui:showMatchesFrame()
+	if matchesTable then matchesTable = nil end -- force matches table to reset (needed because we delete matches if they exceed AAV_MAX_SAVED_MATCHES_COUNT threshold but the table does not update in-memory)
 	if (not matchesTable) then --All initialization
 		AAV_TableGui:createMatchesFrame()
 		AAV_TableGui:createMatchesTable()
@@ -85,8 +86,8 @@ function AAV_TableGui:showMatchesFrame()
 		matchesFrame:SetHeight(height + 30)
 	end
 	if(atroxArenaViewerData.data and atroxArenaViewerData.data[1] and matchesTable.data and matchesTable.data[1]) then
-		-- Quick check to see if the table needs to be updated: if the table has the most recent game and the same number of rows as games recorded then no update required
-		if (atroxArenaViewerData.current.showBySpec ~= currentShowType or atroxArenaViewerData.data[1]["startTime"] ~= matchesTable.data[1].cols[1]["value"] or #atroxArenaViewerData.data ~= #matchesTable.data) then
+		-- Quick check to see if the table needs to be updated: if the table has the most recent game then no update required
+		if (atroxArenaViewerData.current.showBySpec ~= currentShowType or atroxArenaViewerData.data[1]["startTime"] ~= matchesTable.data[1].cols[1]["value"]) then
 			self:fillMatchesTable()
 			currentShowType = atroxArenaViewerData.current.showBySpec
 		end			

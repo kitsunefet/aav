@@ -14,6 +14,8 @@ L.UNKNOWN						= "알수 없음"
 L.SPEED							= "속도"
 L.VIEW_MATCH					= "경기 보기"
 L.VIEW_STATS					= "상황판 보기"
+L.DEL_OLD_MATCHES_1             = "가장 오래된 경기 데이터가 삭제되었으며"
+L.DEL_OLD_MATCHES_2             = "개 이상 저장할 수 없습니다."
 
 L.CONF_NOMATCHES_FOUND			= "저장된 경기가 없습니다."
 L.CONF_WRONG_INPUT				= "입력이 잘못되었습니다."

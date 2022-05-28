@@ -46,21 +46,30 @@ Known Bugs
 * interrupts do not always show ("X") on interrupted spell in play match window
 * sometimes while in arena a LUA error keeps popping up every second, has something to do with spell auras. need to analyze further
 * skirmish games are not recorded properly while broadcasting at the same time
-* Mana bars are not shown
-* Match history gets deleted completely if there is too much saved data (technical limitation which cannot be changed). Will set a max no. of saved matches in a future update to try to prevent this.
 
 Ideas for further improvement (volunteers are very welcome to create pull requests)
 ---
 * detect talent spec by skills that are only available for specific specs (e.g. ice barrier = frost mage)
 * show the duration of buffs/debuffs on targets (currently only done for CC spells)
+* improve visibility of overlapping damage numbers when they all hit within a short timeframe (Feature Request by Accident)
+
+Possible features that are currently not planned to be implemented:
+---
 * add pets
 * track pet spells, e.g. felhunter devour magic, hunterpet intimidation
+=> both would require even more data to be saved so we could only keep a small number of matches saved in total because of technical limitations.
 
 FAQ
 ---
 **How much Memory does the addon use?**
 
 The addon is optimized for high-performance and as few memory usage as possible. Due to these requirements the player uses in play less than 1 MB memory. An average match takes up from 60 ~ 180kb, depends on heavy usage of spells and events (warlocks and resto druids do their job pretty well!). Matches can be deleted to free memory if needed.
+
+**Why do matches disappear automatically?**
+There is a technical limitation on how much data the addon can save (technically speaking: 2^18 keys can be loaded from a table in a function in LUA).
+The recently added feature to show the number of stacks on buffs and debuffs requires a lot more data to be saved, so this limit is reached a lot faster than before.
+To prevent losing all match data at once when exceeding that limit, there is now a maximum number of matched that is kept and older matches get deleted automatically. Currently, this is set to 50 matches.
+Depending on length and type of matches (how much spells were cast, auras applied, refreshed etc.), this may even need to be reduced further in the future.
 
 **Does it hurt my FPS rate?**
 

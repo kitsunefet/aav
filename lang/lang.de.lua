@@ -14,6 +14,8 @@ L.UNKNOWN						= "Unbekannt"
 L.SPEED							= "Geschwindigkeit"
 L.VIEW_STATS					= "Zeige Statistik"
 L.VIEW_MATCH					= "Zeige Match"
+L.DEL_OLD_MATCHES_1             = "Daten des ältesten Matches gelöscht, es können maximal"
+L.DEL_OLD_MATCHES_2             = "Matches gespeichert werden"
 
 L.CONF_NOMATCHES_FOUND			= "keine Matches gefunden."
 L.CONF_WRONG_INPUT				= "falsche Eingabe."

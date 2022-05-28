@@ -1254,8 +1254,55 @@ function AAV_PlayStub:createIndexCycle()
 						self.calc.cc[id][tonumber(s[4])] = nil
 					end
 				end
+
+			-- aura refreshed
+			elseif (event == 15) then 
+				-- buff
+				if (tonumber(s[5]) == 1) then
+					for c,w in pairs(self.calc.buff[id]) do
+						if string.find(w, "/") then
+							local temp = {} 
+							temp = AAV_Util:split(w, "/") -- split buff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
+							if (tonumber(s[4]) == tonumber(temp[1])) then
+								table.remove(self.calc.buff[id], c)
+								table.insert(self.calc.buff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
+								break
+							end
+						else -- backwards compatibility for old match data without #stacks
+							if (tonumber(s[4]) == tonumber(w)) then
+								table.remove(self.calc.buff[id], c)
+								table.insert(self.calc.buff[id], tonumber(s[4]))
+								break
+							end
+						end
+					end
+				-- debuff
+				elseif (tonumber(s[5]) == 2) then
+					for c,w in pairs(self.calc.debuff[id]) do
+						if string.find(w, "/") then
+							local temp = {} 
+							temp = AAV_Util:split(w, "/") -- split debuff spellid and stacks, so we can compare against event type 14 data, which has no stack info (and not possible to get in 14)
+							if (tonumber(s[4]) == tonumber(temp[1])) then
+								table.remove(self.calc.debuff[id], c)
+								table.insert(self.calc.debuff[id], tonumber(s[4]) .. "/" .. tonumber(s[7]))
+								break
+							end
+						else -- backwards compatibility for old match data without #stacks
+							if (tonumber(s[4]) == tonumber(w)) then
+								table.remove(self.calc.debuff[id], c)
+								table.insert(self.calc.debuff[id], tonumber(s[4]))
+								break
+							end
+						end
+					end
+				end
 				
-			-- todo: mana not working, needs further analyzing
+				-- not sure if this would be needed for aura refresh event (15), but looks like no
+				-- if ((tonumber(s[5]) == 1 or tonumber(s[5]) == 2) and tonumber(s[6]) > 0) then
+				-- 	if (not self.calc.cc[id]) then self.calc.cc[id] = {} end
+				-- 	self.calc.cc[id][tonumber(s[4])] = tonumber(s[6])
+				-- end
+				
 			elseif (event == 17) then
 				-- mana
 				if (not self.index[id][k]) then self.index[id][k] = {} end -- c = tick

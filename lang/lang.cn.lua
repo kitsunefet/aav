@@ -14,6 +14,8 @@ L.UNKNOWN						= "未知"
 L.SPEED							= "速度"
 L.VIEW_STATS					= "显示统计"
 L.VIEW_MATCH					= "显示比赛"
+L.DEL_OLD_MATCHES_1             = "最早的匹配數據已刪除，無法保存超過"
+L.DEL_OLD_MATCHES_2             = "場比賽"
 
 L.CONF_NOMATCHES_FOUND			= "未找到比赛"
 L.CONF_WRONG_INPUT				= "输入无效"

@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 4
+AAV_VERSIONBUGFIX = 5
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -56,7 +56,7 @@ AAV_GUI_UPDATEFRAME = CreateFrame("Frame")
 
 AAV_COMBATTEXT_PERSISTENCE = 2.0
 AAV_COMBATTEXT_FADETIME = 0.8
-AAV_COMBATTEXT_CRITTIME = 0.5
+AAV_COMBATTEXT_CRITTIME = 0.5 -- UNUSED
 AAV_COMBATTEXT_FRAMESPEED = 40
 AAV_COMBATTEXT_ALPHASPEED = 3
 AAV_COMBATTEXT_CRITSPEED = 30
@@ -90,6 +90,8 @@ AAV_CC_MAXLISTING = 5
 
 AAV_DETAIL_ENTRYHEIGHT = 20
 AAV_DETAIL_ENTRYWIDTH = 560
+
+AAV_MAX_SAVED_MATCHES_COUNT = 50
 
 AAV_DEBUG_MODE = false
 
@@ -725,9 +727,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 
 				-- do stuff that only needs to be done once, so just do it while we iterate the player themselves
 				if ((name == playerName) and (isRatedArena)) then
-					if AAV_DEBUG_MODE then
-						print("rated arena match") -- debug message
-					end
+					-- if AAV_DEBUG_MODE then
+					-- 	print("rated arena match") -- debug message
+					-- end
 
 					-- always set our own team to id 0, even if we were in team ("faction") 1, to make other stuff easier to manage (e.g. sorting columns in matches table)
 					-- enemy team is always set to id 1 for the same reason
@@ -748,9 +750,9 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					end
 
 				elseif ((name == playerName) and (isUnratedArena) and not (isRatedArena)) then
-					if AAV_DEBUG_MODE then
-						print("unrated arena match") -- debug message
-					end
+					-- if AAV_DEBUG_MODE then
+					-- 	print("unrated arena match") -- debug message
+					-- end
 					
 					-- same reason to always set own team to id 0 and enemy team to id 1 as for rated games, see comments further above
 					if (faction == 0) then
@@ -961,6 +963,14 @@ function atroxArenaViewer:ZONE_CHANGED_NEW_AREA(event, unit)
 			
 			if (atroxArenaViewerData.current.record) then
 				atroxArenaViewerData.data = atroxArenaViewerData.data or {}
+				local saved_matches_count = #atroxArenaViewerData.data -- #matches in data before new match is saved
+
+				-- if #matches + 1 exceeds threshold, delete oldest match to avoid 
+				while saved_matches_count + 1 > AAV_MAX_SAVED_MATCHES_COUNT do
+					print("|cffe392c5<AAV>|r " .. L.DEL_OLD_MATCHES_1 .. " " .. AAV_MAX_SAVED_MATCHES_COUNT .. " " .. L.DEL_OLD_MATCHES_2)
+					self:deleteMatch(1) -- delete oldest match
+					saved_matches_count = saved_matches_count - 1 -- decrement counter
+				end
 				local matchid = self:getNewMatchID()
 				
 				atroxArenaViewerData.data[matchid] = atroxArenaViewerData.data[matchid] or {}
@@ -1212,7 +1222,7 @@ function atroxArenaViewer:UNIT_AURA(event, unit)
 		-- buff/debuff update (already exists = refreshed, stacks changed, ...)
 		if (bspellid and M:getBuffs(id)[bspellid]) then
 			-- update buff
-			M:getBuffs(id)[bspellid] = true -- TODO: do we need this for update events?
+			-- M:getBuffs(id)[bspellid] = true -- TODO: do we need this for update events?
 			
 			if (not dtime) then dtime = 0 end
 			-- if AAV_DEBUG_MODE then
@@ -1225,7 +1235,7 @@ function atroxArenaViewer:UNIT_AURA(event, unit)
 		end
 		if (dspellid and M:getDebuffs(id)[dspellid]) then
 			-- update debuff
-			M:getDebuffs(id)[dspellid] = true -- TODO: do we need this for update events?
+			-- M:getDebuffs(id)[dspellid] = true -- TODO: do we need this for update events?
 			
 			if (not dtime) then dtime = 0 end
 			-- if AAV_DEBUG_MODE then
@@ -1269,29 +1279,34 @@ end
 -- @param unit arena1, arena2...
 function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
 	if atroxArenaViewerData.current.inArena then
-		if (UnitIsPlayer(unit)) then
-			if (not M) then return end
-			local sourceGUID = UnitGUID(unit)
-			
-			-- debugging prints
-			-- if AAV_DEBUG_MODE then
-			-- 	print("======== UNIT_NAME_UPDATE DEBUG MESSAGES")
-			-- 	print(sourceGUID)
-			-- 	print(unit)
-			-- 	print(UnitName(unit))
-			-- 	print(M:getDudesData())
-			-- 	print(M:getDudesData()[sourceGUID].name)
-			-- 	-- TODO: sometimes the first line throws an error, check why
-			-- end
-			if(UnitName(unit)) then
-				M:getDudesData()[sourceGUID].name = UnitName(unit)
-				self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
-			else
-				print("AAV: error UNIT_NAME_UPDATE")
-			end
-			
-			if(strsub(unit, 1, strlen(unit)-1) ~= "raid") then
-				M:SetOpponentSpec(sourceGUID, strsub(unit, strlen(unit)))
+		if (GetZonePVPInfo() == "arena") then -- make sure we really are in arena
+			if (UnitIsPlayer(unit)) then
+				if (not M) then return end
+				local sourceGUID = UnitGUID(unit)
+				
+				-- debugging prints
+				if AAV_DEBUG_MODE then
+					print("======== UNIT_NAME_UPDATE DEBUG MESSAGES")
+					print(sourceGUID)
+					print(unit)
+					print(UnitName(unit))
+					print(M:getDudesData())
+					print(M:getDudesData()[sourceGUID])
+					print(M:getDudesData()[sourceGUID].name)
+					-- TODO: sometimes the first line throws an error, check why
+				end
+				if((UnitName(unit) ~= nil) and (sourceGUID ~= nil) and (unit ~= nil) and (atroxArenaViewerData.current.inArena)) then
+					if (M:getDudesData()[sourceGUID]) then
+						M:getDudesData()[sourceGUID].name = UnitName(unit)
+						self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
+					end
+				else
+					print("AAV: error UNIT_NAME_UPDATE")
+				end
+				
+				-- if(strsub(unit, 1, strlen(unit)-1) ~= "raid") then
+				-- 	M:SetOpponentSpec(sourceGUID, strsub(unit, strlen(unit)))
+				-- end
 			end
 		end
 	end
@@ -1346,12 +1361,12 @@ function atroxArenaViewer:UNIT_SPELLCAST_SUCCEEDED(event,unit,_,spellid)
 	-- filter out spell event from player (self), because we also get an event from raid1/party1 etc.
 	-- filter out spell event from target, because we also get an event from raid1/party1/arena1 etc.
 	-- TODO: check if party1 etc can be safely removed as duplicates from raid1 etc, or if we're missing trinkets then
-	if (unit == "player") or (unit == "target") or (string.find(unit, "nameplate")) or (string.find(unit, "party")) then
-		return
-	end
+	-- if (unit == "player") or (unit == "target") or (string.find(unit, "nameplate")) or (string.find(unit, "party")) then
+	-- 	return
+	-- end
 	-- INFO: other possible solution used in other functions, needs testing tho:
-	-- local sub = string.sub(unit,1,4)
-	-- if (sub ~= "raid" and sub ~= "aren") then return end
+	local sub = string.sub(unit,1,4)
+	if (sub ~= "raid" and sub ~= "aren") then return end
 
 
 	-- PvP Trinket
@@ -1363,18 +1378,18 @@ function atroxArenaViewer:UNIT_SPELLCAST_SUCCEEDED(event,unit,_,spellid)
 		if (not source) then source = 0 end
 		local time = 0
 
-		if AAV_DEBUG_MODE then
-			-- print("--aav message:")
-			-- print(self:getDiffTime())
-			-- print(eventType)
-			-- print(source)
-			-- print(dest)
-			-- print(spellid)
-			-- print(time)
-			print("-- unit used pvp trinket --")
-			print(GetUnitName(unit, true))
-			print(unit)
-		end
+		-- if AAV_DEBUG_MODE then
+		-- 	-- print("--aav message:")
+		-- 	-- print(self:getDiffTime())
+		-- 	-- print(eventType)
+		-- 	-- print(source)
+		-- 	-- print(dest)
+		-- 	-- print(spellid)
+		-- 	-- print(time)
+		-- 	print("-- unit used pvp trinket --")
+		-- 	print(GetUnitName(unit, true))
+		-- 	print(unit)
+		-- end
 		self:createMessage(self:getDiffTime(), eventType .. "," .. source .. "," .. dest .. "," .. spellid .. "," .. time)
 	end
 end
@@ -1620,6 +1635,14 @@ function atroxArenaViewer:createPlayer(num)
 end
 
 function atroxArenaViewer:deleteMatch(num)
+	-- if AAV_DEBUG_MODE then
+	-- 	print(num)
+	-- 	for c,w in pairs(atroxArenaViewerData.data[num]) do
+	-- 		if c == "startTime" then
+	-- 			print("deleting match #" .. num .. " from " .. w)
+	-- 		end
+	-- 	end
+	-- end
 	table.remove(atroxArenaViewerData.data, num)
 end
 
@@ -1887,7 +1910,6 @@ function atroxArenaViewer:executeMatchData(tick, data)
 		
 	elseif (t == 17) then
 		-- mana changes
-		-- TODO: not working, needs further analysis
 		T:setMana(tonumber(data[3]), tonumber(data[4]))
 		
 	elseif (t == 18) then

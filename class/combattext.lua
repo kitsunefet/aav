@@ -45,7 +45,7 @@ function AAV_CombatText:moveText(elapsed, rate)
 	
 	if (self.timer > (1 / AAV_UPDATESPEED)) then
 		
-		self.posY = self.posY + (AAV_COMBATTEXT_FRAMESPEED*self.timer)
+		self.posY = self.posY + (AAV_COMBATTEXT_FRAMESPEED*self.timer) + math.random(0,1)
 		self.text:SetPoint("CENTER", self.parent, "BOTTOM", self.posX, self.posY)
 		
 		if (self.alive > (AAV_COMBATTEXT_PERSISTENCE - AAV_COMBATTEXT_FADETIME)) then
