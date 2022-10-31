@@ -133,18 +133,18 @@ function AAV_TableGui:createMatchesTable()
 			["name"] = "Map",
 			["width"] = 115,
 		}, -- [3]
+		-- {
+		-- 	["name"] = "Team",
+		-- 	["width"] = 125,
+		-- }, -- [4]
 		{
-			["name"] = "Team",
-			["width"] = 125,
-		}, -- [4]
-		{
-			["name"] = " ", -- matchup (class icons)
+			["name"] = "Team Compositions", -- matchup (class icons)
 			["width"] = 250,
-		}, -- [5]
-		{
-			["name"] = "Enemy Team",
-			["width"] = 125,
-		}, -- [6]
+		}, -- [4]
+		-- {
+		-- 	["name"] = "Enemy Team",
+		-- 	["width"] = 125,
+		-- }, -- [6]
 		-- {
 		-- 	["name"] = "Result",
 		-- 	["width"] = 50,
@@ -152,23 +152,23 @@ function AAV_TableGui:createMatchesTable()
 		{
 			["name"] = "Rating",
 			["width"] = 70,
-		}, -- [7]
+		}, -- [5]
 		{
 			["name"] = "MMR",
 			["width"] = 70,
-		}, -- [8]
+		}, -- [6]
 		{
 			["name"] = "Enemy Rating",
 			["width"] = 70,
-		}, -- [9]
+		}, -- [7]
 		{
 			["name"] = "Enemy MMR",
 			["width"] = 70,
-		}, -- [10]
+		}, -- [8]
 		{
 			["name"] = "Delete",
 			["width"] = 50,
-		}, -- [11]
+		}, -- [9]
 	};
 	matchesTable = ScrollingTable:CreateST(cols, 20, 22, nil, matchesFrame);
 	matchesTable:RegisterEvents({
@@ -206,7 +206,14 @@ function AAV_TableGui:fillMatchesTable()
 			data[row].cols = {};
 			
 			local startTime, elapsedStr, mapname, matchUp, ownTeam, enemyTeam, matchResult, ownTeamRating, ownTeamMMR, ownTeamRatingDiff, enemyTeamRating, enemyTeamMMR, enemyTeamRatingDiff = self:determineMatchSummary(row)
-
+			local ownDiffPrefix = ""
+			if ownTeamRatingDiff > 0 then
+				ownDiffPrefix = "+"
+			end
+			local enemyDiffPrefix = ""
+			if enemyTeamRatingDiff > 0 then
+				enemyDiffPrefix = "+"
+			end
 			-- start time
 			data[row].cols[1] = { ["value"] = startTime };
 
@@ -216,49 +223,49 @@ function AAV_TableGui:fillMatchesTable()
 			-- map name
 			data[row].cols[3] = { ["value"] = mapname };
 
-			-- own team name
-			data[row].cols[4] = { ["value"] = ownTeam };
+			-- own team name -> removed for now, no more teams in wotlk (not deleted in case blizzard changes things)
+			-- data[row].cols[4] = { ["value"] = ownTeam };
 			
 			-- matchUp (both teams classes xx vs yy)
-			data[row].cols[5] = { ["value"] = matchUp };
+			data[row].cols[4] = { ["value"] = matchUp };
 
-			-- enemy team name
-			data[row].cols[6] = { ["value"] = enemyTeam};
+			-- enemy team name -> removed for now, no more teams in wotlk 
+			-- data[row].cols[6] = { ["value"] = enemyTeam};
 
-			-- match result -> removed column for now because we just colorize the rating change, looks better imho. may overthin that decision so not yet deleted
+			-- match result -> removed column for now because we just colorize the rating change, looks better imho. may overthink that decision so not yet deleted
 			--data[row].cols[7] = { ["value"] = "" };
 
 			-- own team rating + diff
-			data[row].cols[7] = { ["value"] = ownTeamRating .. " (" .. ownTeamRatingDiff .. ")" };
+			data[row].cols[5] = { ["value"] = ownTeamRating .. " (" .. ownDiffPrefix .. ownTeamRatingDiff .. ")" };
 
 			-- make the world more colorful
 			if (matchResult and matchResult == "WIN") then
-				data[row].cols[7].color = wonMatchColor
+				data[row].cols[5].color = wonMatchColor
 			elseif (matchResult and matchResult == "LOSS") then
-				data[row].cols[7].color = lostMatchColor
+				data[row].cols[5].color = lostMatchColor
 			else
-				data[row].cols[7].color = unknownMatchColor
+				data[row].cols[5].color = unknownMatchColor
 			end
 
 			-- own team MMR
-			data[row].cols[8] = { ["value"] = ownTeamMMR };
+			data[row].cols[6] = { ["value"] = ownTeamMMR };
 
 			-- enemy team rating
-			data[row].cols[9] = { ["value"] = enemyTeamRating .. " (" .. enemyTeamRatingDiff .. ")" };
+			data[row].cols[7] = { ["value"] = enemyTeamRating .. " (" .. enemyDiffPrefix .. enemyTeamRatingDiff .. ")" };
 
 			-- enemy team MMR
-			data[row].cols[10] = { ["value"] = enemyTeamMMR };
+			data[row].cols[8] = { ["value"] = enemyTeamMMR };
 
 			-- delete
-			data[row].cols[11] = { ["value"] = "DELETE" };
-			data[row].cols[11].color = deleteColor
+			data[row].cols[9] = { ["value"] = "DELETE" };
+			data[row].cols[9].color = deleteColor
 
 
 		end
 	else
 		data[1] = {};
 		data[1].cols = {};
-		for i = 1, 11 do
+		for i = 1, 9 do
 			data[1].cols[i] = { ["value"] = "None" }; -- if no data available (empty data)
 		end
 	end

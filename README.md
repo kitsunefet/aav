@@ -1,9 +1,9 @@
-AAV Wotlk Classic - Atrox Arena Viewer
+AAV WotLK Classic - Atrox Arena Viewer
 
 ===
 
-**Wotlk Classic**
-This is a ressurection of Atrox Arena Viewer to work with Wotlk Classic. The original addon uses some WoW API that is not available to Wotlk Classic, the features using the unavailable API have been reworked/replaced (if possible) or removed.
+**WotLK Classic**
+This is a ressurection of Atrox Arena Viewer to work with WotLK Classic. The original addon uses some WoW API that is not available to WotLK Classic, the features using the unavailable API have been reworked/replaced (if possible) or removed.
 
 ===
 

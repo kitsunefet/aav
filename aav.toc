@@ -1,7 +1,7 @@
-## Title: AAV - atrox Arena Viewer (TBC Classic)
+## Title: AAV - atrox Arena Viewer (WotLK Classic)
 ## Author: zwacky (real OG), Skeledurr and Nookyx
 ## Interface: 30400
-## Version: 1.4.6
+## Version: 1.4.7
 ## SavedVariables: atroxArenaViewerData
 ## Notes: record and view arena replays.
 

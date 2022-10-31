@@ -2,11 +2,11 @@ local L = LibStub("AceLocale-3.0"):NewLocale("atroxArenaViewer", "zhTW")
 
 if not L then return end
 
-L.ARENA_START					= "竞技场战斗现在开始！"
-L.ARENA_60						= "竞技场战斗将在一分钟后开始！"
-L.ARENA_45						= "竞技场战斗将在四十五秒后开始！"
-L.ARENA_30						= "竞技场战斗将在三十秒后开始！"
-L.ARENA_15						= "竞技场战斗将在十五秒后开始！"
+L.ARENA_START					= "競技場戰鬥開始了!"
+L.ARENA_60						= "1分鐘後競技場戰鬥開始!"
+L.ARENA_45						= "45秒後競技場戰鬥開始!"
+L.ARENA_30						= "30秒後競技場戰鬥開始!"
+L.ARENA_15						= "15秒後競技場戰鬥開始!"
 
 L.AAV_LOADED					= "加载成功！输入/aav打开设置"
 L.AAV_VERSION_OUTDATED			= "你的竞技场回放版本已过期！"

@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 6
+AAV_VERSIONBUGFIX = 7
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -185,7 +185,7 @@ function atroxArenaViewer:OnInitialize()
     
     local minimap = AAV_Gui:createMinimapIcon(self)
     
-    print("AAV TBC Classic v"..AAV_VERSIONMAJOR.."."..AAV_VERSIONMINOR.."."..AAV_VERSIONBUGFIX.. " " .. L.AAV_LOADED)
+    print("AAV WotLK Classic v"..AAV_VERSIONMAJOR.."."..AAV_VERSIONMINOR.."."..AAV_VERSIONBUGFIX.. " " .. L.AAV_LOADED)
     
     self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
     self:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
@@ -654,8 +654,10 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			local IsActiveBattlefieldArena,GetBattlefieldWinner,GetBattlefieldTeamInfo
 				= IsActiveBattlefieldArena,GetBattlefieldWinner,GetBattlefieldTeamInfo
 			local n = 1 --Chatframe#
-			local teamName0, oldTeamRating0, newTeamRating0, matchMakingRating0 = GetBattlefieldTeamInfo(0) -- Team = 0
-			local teamName1, oldTeamRating1, newTeamRating1, matchMakingRating1 = GetBattlefieldTeamInfo(1) -- Team = 1
+			local _, oldTeamRating0, newTeamRating0, matchMakingRating0 = GetBattlefieldTeamInfo(0) -- Team = 0
+			local _, oldTeamRating1, newTeamRating1, matchMakingRating1 = GetBattlefieldTeamInfo(1) -- Team = 1
+			local teamName0 = "own team"
+			local teamName1 = "enemy team"
 			local diff0 = newTeamRating0 - oldTeamRating0
 			local diff1 = newTeamRating1 - oldTeamRating1
 			local playerTeamColor = 'nocolor'
