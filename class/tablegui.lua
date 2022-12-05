@@ -47,7 +47,7 @@ function AAV_TableGui:createMatchesFrame()
 	
 
 	local ts = m:CreateFontString("$parentName", "ARTWORK", "GameFontNormal")
-	ts:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+	ts:SetFont("Fonts\\FRIZQT___CYR.TTF", 16, "OUTLINE")
 	ts:SetText("AAV: Recorded Matches")
 	ts:SetPoint("CENTER", m, 0, 0)
 	ts:Show()
