@@ -675,7 +675,6 @@ end
 -- @param parent a skillused object
 -- @return frame 
 function AAV_Gui:createInterruptFrame(parent)	
-	
 	local f = CreateFrame("Frame", "$parentX", parent)
 	f:SetFrameStrata("HIGH")
 	f:SetWidth(AAV_USEDSKILL_ICONSIZE)
@@ -683,12 +682,12 @@ function AAV_Gui:createInterruptFrame(parent)
 	f:SetAllPoints(parent)
 	f:Show()
 	
-	local t = f:CreateTexture(nil, "HIGH")
+	local t = f:CreateTexture(nil)
 	t:SetTexture("Interface\\Addons\\aav\\res\\X.tga")
 	f.texture = t
 	t:SetAllPoints(f)
 	t:Show()
-	
+
 	return f
 end
 
