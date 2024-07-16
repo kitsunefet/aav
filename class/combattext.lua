@@ -38,6 +38,7 @@ function AAV_CombatText:setValue(p, type, amount, crit)
 	
 	
 	self.text:SetText(pre .. amount)
+	self.text:SetAlpha(1)
 end
 
 function AAV_CombatText:moveText(elapsed, rate)

@@ -1,9 +1,9 @@
-AAV WotLK Classic - Atrox Arena Viewer
+AAV Cata Classic - Atrox Arena Viewer
 
 ===
 
-**WotLK Classic**
-This is a ressurection of Atrox Arena Viewer to work with WotLK Classic. The original addon uses some WoW API that is not available to WotLK Classic, the features using the unavailable API have been reworked/replaced (if possible) or removed.
+**Cata Classic**
+This is a ressurection of Atrox Arena Viewer to work with Cata Classic. The original addon uses some WoW API that is not available to Cata Classic, the features using the unavailable API have been reworked/replaced (if possible) or removed.
 
 ===
 
@@ -99,3 +99,4 @@ In the current version pets are completely disabled, means, their damage and con
 ---
 Shoutout to the OG addon author [zwacky](https://twitter.com/zwacky) for creating such a wonderful WoW Arena PvP Addon! It really helped me blame my teammates a lot of times ;)
 Further credits go to [skeledurr](https://github.com/Skeledurr/aav) for doing a lot of preparation work to make this workable since TBC Classic.
+Thanks [Nookyx](https://github.com/Nookyx) for fixes and maintaining addon during WotLK.

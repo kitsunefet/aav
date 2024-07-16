@@ -32,7 +32,7 @@ end
 
 function AAV_TeamStats:trunkHCritSpellName(spellName)
 	local spellNameLen = string.len(spellName)
-	local MAXLINECHARS = 13
+	local MAXLINECHARS = 16
 	local tmp
 	
 	if ( spellNameLen > MAXLINECHARS ) then

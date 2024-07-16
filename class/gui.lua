@@ -177,16 +177,15 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	--m:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	m:SetMinMaxValues(0,100)
 	
-	if (manauser) then m:SetStatusBarColor(0.5333333333333333, 0.5333333333333333, 1) end
-	
-	m:SetMinMaxValues(0,100)
+	if (manauser) then m:SetStatusBarColor(0.53, 0.53, 0.9) end
+
 	m:SetPoint("BOTTOMLEFT", a:GetName(), "TOPLEFT", 30, -(AAV_GUI_HEALTHBARHEIGHT - 1))
 	if (manauser) then m:Show() else m:Hide() end
 	
-	local mback = m:CreateTexture(nil)
-	mback:SetColorTexture(0.0, 0.0, 0.0)
+	local mback = m:CreateTexture(nil, "BACKGROUND")
 	mback:SetAllPoints(m)
-	m.texture = mback
+	mback:SetColorTexture(0, 0, 0, 1)
+	m.tex = mback
 	
 	
 	-- COMBAT TEXT

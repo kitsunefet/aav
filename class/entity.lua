@@ -81,7 +81,7 @@ function AAV_PlayerEntity:setValue(class, name, maxhp, v)
 		self.mana:Show()
 		self.bar:SetHeight(AAV_GUI_HEALTHBARHEIGHT - AAV_GUI_MANABARHEIGHT)
 		self.mana:SetValue(100)
-		self.mana:SetStatusBarColor(0.5333333333333333, 0.5333333333333333, 1)
+		self.mana:SetStatusBarColor(0.53, 0.53, 0.9)
 	else
 		self.mana:Hide()
 		self.bar:SetHeight(AAV_GUI_HEALTHBARHEIGHT)
