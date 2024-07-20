@@ -817,6 +817,12 @@ function AAV_PlayStub:createPlayer(bracket, elapsed, broadcast)
 	if (not self.player) then 
 		self.origin, self.player, self.maptext, self.loading = AAV_Gui:createPlayerFrame(self, bracket)
 		self.detail = AAV_Gui:createButtonDetail(self.origin)
+		self.speed0 = AAV_Gui:createButtonSpeed0(self.origin)
+		self.speed02 = AAV_Gui:createButtonSpeed02(self.origin)
+		self.speed05 = AAV_Gui:createButtonSpeed05(self.origin)
+		self.speed1 = AAV_Gui:createButtonSpeed1(self.origin)
+		self.speed2 = AAV_Gui:createButtonSpeed2(self.origin)
+		self.speed3 = AAV_Gui:createButtonSpeed3(self.origin)
 		self.seeker = {}
 		
 		self.seeker.bar, self.seeker.back, self.seeker.slide, self.seeker.speedval, self.seeker.speed = AAV_Gui:createSeekerBar(self.player, elapsed)
@@ -844,6 +850,44 @@ function AAV_PlayStub:createPlayer(bracket, elapsed, broadcast)
 				self.stats:Show()
 				-- stop timer
 			end
+		end)
+
+		local speed = self.seeker.speed
+		self.speed0:SetText('❚❚')
+		self.speed02:SetText('1/5')
+		self.speed05:SetText('1/2')
+		self.speed1:SetText('|>')
+		self.speed2:SetText('x2')
+		self.speed3:SetText('x3')
+		self.speed0:SetScript("OnClick", function() 
+			atroxArenaViewerData.current.interval = 0
+			self.seeker.slide:SetValue(0)
+			speed:SetText("0%")
+		end)
+		self.speed02:SetScript("OnClick", function() 
+			atroxArenaViewerData.current.interval = 20/1000
+			self.seeker.slide:SetValue(20)
+			speed:SetText("20%")
+		end)
+		self.speed05:SetScript("OnClick", function() 
+			atroxArenaViewerData.current.interval = 50/1000
+			self.seeker.slide:SetValue(50)
+			speed:SetText("50%")
+		end)
+		self.speed1:SetScript("OnClick", function() 
+			atroxArenaViewerData.current.interval = 100/1000
+			self.seeker.slide:SetValue(100)
+			speed:SetText("100%")
+		end)
+		self.speed2:SetScript("OnClick", function() 
+			atroxArenaViewerData.current.interval = 200/1000
+			self.seeker.slide:SetValue(200)
+			speed:SetText("200%")
+		end)
+		self.speed3:SetScript("OnClick", function() 
+			atroxArenaViewerData.current.interval = 300/1000
+			self.seeker.slide:SetValue(300)
+			speed:SetText("300%")
 		end)
 		
 		if (broadcast) then

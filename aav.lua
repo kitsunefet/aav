@@ -1757,7 +1757,7 @@ function atroxArenaViewer:playMatch(num)
 		vmajor = tonumber(vmajor)
 		vminor = tonumber(vminor)
 		vbugfix = tonumber(vbugfix)
-		if ((vmajor < AAV_VERSIONMAJOR) or (vmajor == AAV_VERSIONMAJOR and vminor < AAV_VERSIONMINOR) or (vmajor == AAV_VERSIONMAJOR and vminor == AAV_VERSIONMINOR and vbugfix < AAV_VERSIONBUGFIX)) then
+		if ((vmajor < AAV_VERSIONMAJOR) or (vmajor == AAV_VERSIONMAJOR and vminor < AAV_VERSIONMINOR)) then --bugfix version should be compatible with old replays, othervise make it minor\major
 			StaticPopup_Show("AAV_PLAYOLDMATCHES_DIALOG")
 		end
 		

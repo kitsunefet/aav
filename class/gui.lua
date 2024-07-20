@@ -454,6 +454,65 @@ function AAV_Gui:createButtonDetail(parent)
 	return detail
 end
 
+function AAV_Gui:createButtonSpeed0(parent)
+	local button = CreateFrame("BUTTON", "$parentViewSpeed0", parent, "UIPanelButtonTemplate")
+	button:SetPoint("BOTTOMRIGHT", -355, 15)
+	button:SetWidth(25)
+	button:SetHeight(25)
+	button:Show()
+	
+	return button
+end
+
+function AAV_Gui:createButtonSpeed02(parent)
+	local button = CreateFrame("BUTTON", "$parentViewSpeed02", parent, "UIPanelButtonTemplate")
+	button:SetPoint("BOTTOMRIGHT", -330, 15)
+	button:SetWidth(25)
+	button:SetHeight(25)
+	button:Show()
+	return button
+end
+
+function AAV_Gui:createButtonSpeed05(parent)
+	local button = CreateFrame("BUTTON", "$parentViewSpeed05", parent, "UIPanelButtonTemplate")
+	button:SetPoint("BOTTOMRIGHT", -305, 15)
+	button:SetWidth(25)
+	button:SetHeight(25)
+	button:Show()
+	
+	return button
+end
+
+function AAV_Gui:createButtonSpeed1(parent)
+	local button = CreateFrame("BUTTON", "$parentViewSpeed1", parent, "UIPanelButtonTemplate")
+	button:SetPoint("BOTTOMRIGHT", -280, 15)
+	button:SetWidth(25)
+	button:SetHeight(25)
+	button:Show()
+	
+	return button
+end
+
+function AAV_Gui:createButtonSpeed2(parent)
+	local button = CreateFrame("BUTTON", "$parentViewSpeed2", parent, "UIPanelButtonTemplate")
+	button:SetPoint("BOTTOMRIGHT", -255, 15)
+	button:SetWidth(25)
+	button:SetHeight(25)
+	button:Show()
+	
+	return button
+end
+
+function AAV_Gui:createButtonSpeed3(parent)
+	local button = CreateFrame("BUTTON", "$parentViewSpeed3", parent, "UIPanelButtonTemplate")
+	button:SetPoint("BOTTOMRIGHT", -230, 15)
+	button:SetWidth(25)
+	button:SetHeight(25)
+	button:Show()
+	
+	return button
+end
+
 function AAV_Gui:createTeamHead(parent, posY, team)
 
 	-- if AAV_DEBUG_MODE then
