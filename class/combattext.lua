@@ -23,6 +23,7 @@ function AAV_CombatText:setValue(p, type, amount, crit)
 	
 	self.parent = p
 	_, _, _, self.posX, self.posY = p:GetPoint(1)
+	self.posY = self.posY - AAV_COMBATTEXT_SCROLLINGTEXTCRITPLUS
 
 	self.timer = 0
 	self.alive = 0
@@ -75,4 +76,8 @@ end
 
 function AAV_CombatText:hide()
 	self.text:SetAlpha(0)
+end
+
+function AAV_CombatText:slideTop(offset)
+	self:moveText(offset, GetFramerate())
 end

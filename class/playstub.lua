@@ -539,29 +539,22 @@ end
 function AAV_PlayStub:addFloatingCombatText(id, amount, crit, type)
 	if (not self.entities[id]) then return end
 	
-	local found = false
-	local oldest_alive = 0
-	local oldest = 1
+	-- get last combat text alive and move stack if alive is too small
+	local new_offset = 0
+	if self.entities[id].textlast > 0 then
+		new_offset = self.pool.cbt[self.entities[id].textlast].alive - AAV_GUI_COMBATTEXTOBJECTSOFFSET
+	end
+	if (new_offset < 0) then
+		self:noticeToSlideText(id, -new_offset)
+	end
+
 	if (#self.pool.cbt <= AAV_GUI_MAXCOMBATTEXTOBJECTS) then
 		table.insert(self.pool.cbt, AAV_CombatText:new(self.entities[id].crange, self.entities[id].team, type, amount, crit))
+		self.entities[id].textlast = #self.pool.cbt
 	else
-		for k,v in pairs(self.pool.cbt) do
-			if (v:isDead()) then
-				v:setValue(self.entities[id].crange, type, amount, crit)
-				found = true
-				break
-			end
-		end
-		if (not found) then
-			--find oldest
-			for k,v in pairs(self.pool.cbt) do
-				if (v.alive>oldest_alive) then
-					oldest_alive = v.alive
-					oldest = k
-				end
-			end
-			self.pool.cbt[oldest]:setValue(self.entities[id].crange, type, amount, crit)
-		end
+		oldest = AAV_Util:getLatestAlive(self.pool.cbt, id)
+		self.pool.cbt[oldest]:setValue(self.entities[id].crange, type, amount, crit)
+		self.entities[id].textlast = oldest
 	end
 end
 
@@ -605,6 +598,19 @@ function AAV_PlayStub:addCooldown(id, spellid, duration)
 end
 
 ----
+-- let the combat text scroll up.
+-- @param id playerid
+function AAV_PlayStub:noticeToSlideText(id, offset)
+	if (not self.entities[id]) then return end
+
+	for k,v in pairs(self.pool.cbt) do
+		if(v.parent==self.entities[id].crange) then
+			v:slideTop(offset)
+		end
+	end
+end
+
+----
 -- let the skill bar slide to the right.
 -- @param id playerid
 function AAV_PlayStub:noticeToSlide(id)
@@ -639,8 +645,6 @@ function AAV_PlayStub:addSkillIcon(id, spellid, cast, targetid, casttaim)
 	
 	--check if already exist UsedSkills
 	local found = false
-	local oldest_alive = 0
-	local oldest = 1
 	
 	if (#self.entities[id].skills < AAV_GUI_MAXUSEDSKILLSOBJECTS) then
 		
@@ -649,25 +653,8 @@ function AAV_PlayStub:addSkillIcon(id, spellid, cast, targetid, casttaim)
 		table.insert(self.usedskills, us)
 		table.insert(self.entities[id].skills, us)
 	else
-		for k,v in pairs(self.entities[id].skills) do
-			if (v:isDead()) then
-				self:noticeToSlide(id)
-				v:setValue(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
-				found = true
-				break
-			end
-		end
-		if (not found) then
-			--find oldest
-			for k,v in pairs(self.entities[id].skills) do
-				if (v.alive>oldest_alive) then
-					oldest_alive = v.alive
-					oldest = k
-				end
-			end
-			self:noticeToSlide(id)
-			self.entities[id].skills[oldest]:setValue(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
-		end
+		self:noticeToSlide(id)
+		self.entities[id].skills[AAV_Util:getLatestAlive(self.entities[id].skills)]:setValue(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
 	end
 end
 

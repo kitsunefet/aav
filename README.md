@@ -51,7 +51,6 @@ Ideas for further improvement (volunteers are very welcome to create pull reques
 ---
 * detect talent spec by skills that are only available for specific specs (e.g. ice barrier = frost mage)
 * show the duration of buffs/debuffs on targets (currently only done for CC spells)
-* improve visibility of overlapping damage numbers when they all hit within a short timeframe (Feature Request by Accident)
 
 Possible features that are currently not planned to be implemented:
 ---

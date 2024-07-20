@@ -361,7 +361,7 @@ function AAV_Gui:createSeekerBar(parent, elapsed)
 	speed:Show()
 	
 	slider:SetScript("OnValueChanged", function(s)
-		speed:SetText(s:GetValue() .. "%") 
+		speed:SetText(string.format("%.2f",s:GetValue()) .. "%")
 		if (s:GetValue()>0) then 
 			atroxArenaViewerData.current.interval = s:GetValue() / 1000
 		else

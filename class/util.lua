@@ -424,6 +424,24 @@ function AAV_Util:determineManaUser(class)
 end
 
 ----
+-- returns index of latest alive or dead scrolling element
+-- @param objects
+function AAV_Util:getLatestAlive(objects)
+	local oldest_alive = 0
+	local oldest = 1
+	for k,v in pairs(objects) do
+		if (v:isDead()) then
+			return k
+		end
+		if (v.alive>oldest_alive) then
+			oldest_alive = v.alive
+			oldest = k
+		end
+	end
+	return oldest
+end
+
+----
 -- returns the color of the targetid
 -- @param data player data
 -- @param urgent use class colors

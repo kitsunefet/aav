@@ -18,6 +18,7 @@ function AAV_PlayerEntity:new(parent, v, y, maxhp)
 	self.buffs = {}
 	self.debuffs = {}
 	self.cooldowns = {}
+	self.textlast = nil
 	
 	return self
 end
