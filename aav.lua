@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 15
+AAV_VERSIONBUGFIX = 16
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -781,7 +781,7 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 				-- original: M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
 				-- note: rating, personalRatingChange and mmr are not obtainable on a per-player basis in TBC classic, just per-team. so we always set 0 for now
 				-- maybe we'll find some way in the future?
-				M:setPlayer(guids,name, 0, damageDone, healingDone, 0, 0, "nospec")
+				M:setPlayer(guids,name, 0, damageDone, healingDone, 0, 0, AAV_Spec:GetSpecOrDefault(name))
 			end
 			
 			if (atroxArenaViewerData.current.broadcast) then
@@ -942,7 +942,9 @@ function atroxArenaViewer:INSPECT_READY(event, guid, other)
 end
 
 function atroxArenaViewer:ZONE_CHANGED_NEW_AREA(event, unit)	
-	
+
+	AAV_Spec.specTable = {}
+
 	if (GetZonePVPInfo() == "arena") then
 	
 		CombatLogClearEntries() -- fixes combat log parse overflow problem		
@@ -1015,6 +1017,8 @@ function atroxArenaViewer:handleEvents(val)
 		self:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 		self:RegisterEvent("UNIT_NAME_UPDATE")
 		self:RegisterEvent("UNIT_AURA")
+		self:RegisterEvent("UNIT_SPELLCAST_START")
+		self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 		atroxArenaViewerData.current.inFight = true
 		
 		
@@ -1028,6 +1032,8 @@ function atroxArenaViewer:handleEvents(val)
 		self:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
 		self:UnregisterEvent("UNIT_NAME_UPDATE")
 		self:UnregisterEvent("UNIT_AURA")
+		self:UnregisterEvent("UNIT_SPELLCAST_START")
+		self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 		atroxArenaViewerData.current.inFight = false
 		
 	end
@@ -1177,6 +1183,9 @@ function atroxArenaViewer:UNIT_HEALTH(event, unit)
 end
 
 function atroxArenaViewer:UNIT_AURA(event, unit)
+
+	AAV_Spec:ScanUnitBuffs(unit)
+
 	local n, m = 1, 1
 	local sub = string.sub(unit,1,4)
 	if (sub ~= "raid" and sub ~= "aren") then return end
@@ -1275,6 +1284,34 @@ function atroxArenaViewer:UNIT_AURA(event, unit)
 	
 end
 
+function atroxArenaViewer:UNIT_SPELLCAST_START(event, unit, castGUID)
+    local spellName, _, _, _, _, _, _, _, spellID = CastingInfo(event)
+
+    if event then
+        AAV_Spec:ScanUnitBuffs(unit)
+    end
+
+    if spellName then
+        if AAV_Spec.specSpells[spellID] and event then
+            local name = GetUnitName(unit, true)
+            self:OnSpecDetected(name, AAV_Spec.specSpells[spellID])
+        end
+    end
+end
+
+function atroxArenaViewer:UNIT_SPELLCAST_CHANNEL_START(event, unit, castGuid, spellId)
+    if unit then 
+        AAV_Spec:ScanUnitBuffs(unit)
+    end
+
+    if spellId then
+        if AAV_Spec.specSpells[spellId] and unit then
+            local name = GetUnitName(unit, true)
+            self:OnSpecDetected(name, AAV_Spec.specSpells[spellId])
+        end
+    end
+end
+
 ----
 -- Called when a name update is available, will set the name and spec (spec removed in TBC classic, because not available via API)
 -- @param event
@@ -1316,13 +1353,14 @@ end
 
 function atroxArenaViewer:ARENA_OPPONENT_UPDATE(event, unit, type)
 	local u = M:getGUIDtoNumber(UnitGUID(unit))
+	AAV_Spec:ScanUnitBuffs(unit)
 	
 	if (type == "seen") then
 		if (not u) then
 			local key, player = M:updateMatchPlayers(2, unit)
 			self:sendPlayerInfo(key, player)
 			if (UnitIsPlayer(unit)) then
-				M:SetOpponentSpec(UnitGUID(unit), strsub(unit, strlen(unit)))
+				M:SetOpponentSpec(UnitGUID(unit), strsub(unit, strlen(unit))) --TODO
 			end
 			
 			--self:ScheduleTimer("initArenaMatchUnits", AAV_INITOFFTIME, {unit, 2})
@@ -1359,6 +1397,17 @@ end
 -- looks like own team is best tracked as raid1, raid2 etc
 -- got the idea how to handle this from Omnibar, credits to Omnibars developer!
 function atroxArenaViewer:UNIT_SPELLCAST_SUCCEEDED(event,unit,_,spellid)
+
+	if unit then
+        AAV_Spec:ScanUnitBuffs(unit)
+    end
+
+    if spellid then
+        if AAV_Spec.specSpells[spellid] and unit then
+            local name = GetUnitName(unit, true)
+            AAV_Spec:OnSpecDetected(name, AAV_Spec.specSpells[spellid])
+        end
+    end
 
 	-- filter out spell event from player (self), because we also get an event from raid1/party1 etc.
 	-- filter out spell event from target, because we also get an event from raid1/party1/arena1 etc.
@@ -1741,7 +1790,6 @@ end
 -- @param num matchid
 function atroxArenaViewer:playMatch(num)
 	local pre
-	print('play match')
 	if (T:getCurrentMatchData()) then
 		pre = AAV_Util:split(T:getCurrentMatchData(), ',')
 		T:removeAllCC()

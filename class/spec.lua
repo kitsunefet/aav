@@ -1,6 +1,9 @@
-local atroxArenaViewer = LibStub("AceAddon-3.0"):GetAddon("atroxArenaViewer")
+-- credits: ArenaStats
+AAV_Spec = {}
+AAV_Spec.__index = AAV_Spec
 
-local specSpells = {
+AAV_Spec.specTable = {}
+AAV_Spec.specSpells = {
     [55050] = "Blood",         -- Heart Strike
     [55233] = "Blood",         -- Vampiric Blood
     [49028] = "Blood",         -- Dancing Rune Weapon
@@ -384,6 +387,55 @@ local specSpells = {
     [12809] = "Protection",  -- Concussion blow (debuff)
 }
 
-function atroxArenaViewer:getSpecSpells()
+function AAV_Spec:getSpecSpells()
     return specSpells
+end
+
+function AAV_Spec:ScanUnitBuffs(unit)
+    for n = 1, 30 do
+        local auraData = C_UnitAuras.GetAuraDataByIndex(unit, n, "HELPFUL")
+
+        if (not auraData) then
+            break
+        end
+
+        if (not auraData.name) then
+            break
+        end
+
+        local spellID = auraData.spellId
+        local unitCaster = auraData.sourceUnit
+
+        if AAV_Spec.specSpells[spellID] and unitCaster then -- Check for auras that detect a spec
+            local unitPet = string.gsub(unit, "%d$", "pet%1")
+            if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
+                AAV_Spec:OnSpecDetected(GetUnitName(unitCaster, true), AAV_Spec.specSpells[spellID])
+            end
+        end
+    end
+end
+
+function AAV_Spec:OnSpecDetected(unitName, spec)
+    local existingPlayer = AAV_Spec.specTable[unitName]
+
+    if existingPlayer then
+        return
+    end
+
+    AAV_Spec.specTable[unitName] = spec
+    --print(unitName .. " " .. spec)
+end
+
+function AAV_Spec:GetSpecOrDefault(unitName)
+    if not unitName then
+        return "nospec"
+    end
+
+    local detectedSpec = AAV_Spec.specTable[unitName]
+
+    if detectedSpec then
+        return detectedSpec
+    end
+
+    return "nospec"
 end
