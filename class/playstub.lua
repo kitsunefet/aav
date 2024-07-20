@@ -125,6 +125,10 @@ function AAV_PlayStub:hidePlayer(frame)
 				end
 			end
 		end
+		-- drop indexes
+		for k,v in pairs(self.index) do
+			self.index[k] = nil
+		end
 		
 		frame:Hide()
 	end
@@ -1147,6 +1151,7 @@ function AAV_PlayStub:removeAllCooldowns()
 	for k,v in pairs(self.cooldowns) do
 		v.dead = true
 		v.frame:Hide()
+		self.cooldowns[k] = nil
 	end
 	for k,v in pairs(self.entities) do
 		v:removeAllCooldowns()
