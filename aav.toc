@@ -39,3 +39,4 @@ class\aura.lua
 class\crowd.lua
 class\cooldown.lua
 class\teamstats.lua
+class\spec.lua

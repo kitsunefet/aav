@@ -243,7 +243,7 @@ function AAV_PlayStub:newEntities(f)
 				self.pool.list[v.team][dir[v.team]] = entity
 				self.entities[v.ID] = entity
 			else
-				self.pool.list[v.team][dir[v.team]]:setValue(v.class, v.name, v.starthpmax, v)
+				self.pool.list[v.team][dir[v.team]]:setValue(v.class, v.spec, v.name, v.starthpmax, v)
 				self.entities[v.ID] = self.pool.list[v.team][dir[v.team]]
 				self.entities[v.ID]:transferAuras(self.pool.list[v.team][dir[v.team]])
 			end
@@ -813,7 +813,7 @@ end
 -- @param elapsed time
 -- @param broadcast true = watches a broadcasts, false = local playing
 function AAV_PlayStub:createPlayer(bracket, elapsed, broadcast)
-	
+
 	if (not self.player) then 
 		self.origin, self.player, self.maptext, self.loading = AAV_Gui:createPlayerFrame(self, bracket)
 		self.detail = AAV_Gui:createButtonDetail(self.origin)
@@ -926,11 +926,23 @@ function AAV_PlayStub:createPlayer(bracket, elapsed, broadcast)
 		self:handleIndexCreation("start")
 		self:setSeekerTooltip()
 		self.detail:Show()
+		self.speed0:Show()
+		self.speed02:Show()
+		self.speed05:Show()
+		self.speed1:Show()
+		self.speed2:Show()
+		self.speed3:Show()
 		
 		self:createStats(self:getMatch()["teams"], self:getMatch()["combatans"]["dudes"], bracket)
 		
 	else
 		self.detail:Hide()
+		self.speed0:Hide()
+		self.speed02:Hide()
+		self.speed05:Hide()
+		self.speed1:Hide()
+		self.speed2:Hide()
+		self.speed3:Hide()
 		self.loading:Hide()
 		self.player:Show()
 		

@@ -358,7 +358,6 @@ function atroxArenaViewer:lookupBroadcast(prefix, msg, dist, sender)
 		T:handleSeeker("hide")
 		
 		T:setStatus(sd.state)
-		
 		print("|cffe392c5<AAV>|r " .. L.CONNECT_CONNECTED_TO .. sender .. ". " .. L.CONNECT_WAITING_DATA)
 		
 	elseif (b and sd.event == AAV_COMM_EVENT["cmd_matchend"] and atroxArenaViewerData.current.listening == sender) then
@@ -1621,7 +1620,6 @@ function atroxArenaViewer:createPlayer(num)
 		return
 	end
 	
-	
 	-- check if bracket is available
 	if (atroxArenaViewerData.data[num].bracket == nil) then
 		atroxArenaViewerData.data[num].bracket = 0
@@ -1633,7 +1631,6 @@ function atroxArenaViewer:createPlayer(num)
 	end
 	
 	T:createPlayer(atroxArenaViewerData.data[num].bracket, atroxArenaViewerData.data[num].elapsed, false)
-	
 	print("|cffe392c5<AAV>|r Start playing: " .. AAV_COMM_MAPS[atroxArenaViewerData.data[num].map] .. " at " .. atroxArenaViewerData.data[num].startTime)
 end
 
@@ -1744,7 +1741,7 @@ end
 -- @param num matchid
 function atroxArenaViewer:playMatch(num)
 	local pre
-	
+	print('play match')
 	if (T:getCurrentMatchData()) then
 		pre = AAV_Util:split(T:getCurrentMatchData(), ',')
 		T:removeAllCC()

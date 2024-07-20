@@ -19,6 +19,7 @@ function AAV_PlayerEntity:new(parent, v, y, maxhp)
 	self.debuffs = {}
 	self.cooldowns = {}
 	self.textlast = 0
+	self.spec = v.spec
 	
 	return self
 end
@@ -71,9 +72,12 @@ end
 -- reuses an existing PlayerEntity object and alters its information.
 -- @param class player class
 -- @param name player name
-function AAV_PlayerEntity:setValue(class, name, maxhp, v)
+function AAV_PlayerEntity:setValue(class, spec, name, maxhp, v)
 	self.data = v
 	self.icon.texture:SetTexture("Interface\\Addons\\aav\\res\\" .. class .. ".tga")
+	if (spec~="" and spec~="nospec") then
+		self.icon.texture:SetTexture("Interface\\Addons\\aav\\res\\spec\\" .. spec .. ".tga")
+	end
 	self.name:SetText(name)
 	self.bar:SetMinMaxValues(0, maxhp)
 	self.text:SetText("100%") -- ugly hack [#37]

@@ -335,6 +335,9 @@ function AAV_TableGui:determineMatchSummary(num)
 				else
 					idSortStr = "   " .. w.name .. c
 				end
+				if (w.spec~="" and w.spec~="nospec") then
+					idSortStr = w.spec
+				end
 				if (w.ddone > w.hdone) then
 					idSortStr = "DAMAGER".. idSortStr .. i
 				else
@@ -363,6 +366,9 @@ function AAV_TableGui:determineMatchSummary(num)
 				icon = specIconTable[w.class]
 			else
 				icon = specIconTable("UNKNOWN")
+			end
+			if (w.spec~="" and w.spec~="nospec") then
+				icon = "\124T" .. "Interface\\Addons\\aav\\res\\spec\\" .. w.spec .. ":22\124t"
 			end
 			sortedNames = sortedNames .. " " .. icon
 		end

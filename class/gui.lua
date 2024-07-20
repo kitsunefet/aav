@@ -146,6 +146,9 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	else
 		t:SetTexture("Interface\\Addons\\aav\\res\\" .. v.class .. ".tga")
 	end
+	if (v.spec ~= "" and v.spec ~= "nospec") then
+		t:SetTexture("Interface\\Addons\\aav\\res\\spec\\" .. v.spec .. ".tga")
+	end
 	t:SetAllPoints(c)
 	c.texture = t
 	c:SetPoint("TOPLEFT", a:GetName(), 0, 15)
