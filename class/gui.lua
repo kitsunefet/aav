@@ -208,7 +208,7 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	n:Show()
 	
 	-- SKILL
-	local sr = CreateFrame("Frame", "$parentSkillRange", parent)
+	local sr = CreateFrame("Frame", "$parentEntity".. v.team .. y.."SkillRange", parent)
 	sr:SetFrameStrata("HIGH")
 	sr:SetWidth(a:GetWidth())
 	sr:SetHeight(30)
@@ -655,6 +655,8 @@ function AAV_Gui:createUsedSkill(parent, i)
 	--b:SetAllPoints(f)
 	b:SetWidth(AAV_USEDSKILL_ICONSIZE-1)
 	b:SetHeight(AAV_USEDSKILL_ICONSIZE)
+	b:SetFrameLevel(5)
+	b:SetAlpha(0)
 	b:Show()
 	
 	-- texture

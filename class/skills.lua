@@ -21,7 +21,8 @@ function AAV_UsedSkill:isDead()
 end
 
 function AAV_UsedSkill:setValue(parent, spellid, cast, num, v)
-	local name, _, icon, cost, isfunnel, ptype, casttime = GetSpellInfo(spellid)
+	local name, _, icon, casttime, _, _, _, _ = GetSpellInfo(spellid)
+	--if (casttime>0) then print(casttime .. "-" .. name) end
 	if (name == nil) then
 		return
 	end
@@ -49,8 +50,9 @@ function AAV_UsedSkill:setValue(parent, spellid, cast, num, v)
 	self.frame.texture:SetTexture(icon)
 	
 	self.bar:SetHeight(AAV_USEDSKILL_ICONSIZE)
-	self.bar.texture:SetTexture(0, 0, 0, 0.65)
-	self.bar:SetAlpha(1)
+	--self.bar.texture:SetVertexColor(0, 0, 0, 0.65)
+	self.bar.texture:SetTexture("Interface\\Addons\\aav\\res\\black.tga")
+	self.bar:SetAlpha(0.65)
 	self:setPointForBar()
 	
 	self.frame:EnableMouse(true)
@@ -75,7 +77,7 @@ function AAV_UsedSkill:setValue(parent, spellid, cast, num, v)
 		self.tcolor.texture:SetColorTexture(0,0,0,1)
 		self.target:Hide()
 	end
-	
+
 	if (cast) then self.bar:Show() else self.bar:Hide() end
 end
 

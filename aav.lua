@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 16
+AAV_VERSIONBUGFIX = 17
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -1285,16 +1285,16 @@ function atroxArenaViewer:UNIT_AURA(event, unit)
 end
 
 function atroxArenaViewer:UNIT_SPELLCAST_START(event, unit, castGUID)
-    local spellName, _, _, _, _, _, _, _, spellID = CastingInfo(event)
+    local spellName, _, _, _, _, _, _, _, spellId = CastingInfo(event)
 
     if event then
         AAV_Spec:ScanUnitBuffs(unit)
     end
 
     if spellName then
-        if AAV_Spec.specSpells[spellID] and event then
+        if AAV_Spec.specSpells[spellId] and event then
             local name = GetUnitName(unit, true)
-            self:OnSpecDetected(name, AAV_Spec.specSpells[spellID])
+            self:OnSpecDetected(name, AAV_Spec.specSpells[spellId])
         end
     end
 end
@@ -1419,30 +1419,30 @@ function atroxArenaViewer:UNIT_SPELLCAST_SUCCEEDED(event,unit,_,spellid)
 	local sub = string.sub(unit,1,4)
 	if (sub ~= "raid" and sub ~= "aren") then return end
 
+	-- cata tracks pvp trinket without this
+	---- PvP Trinket
+	--if spellid == 42292 then
+	--	
+	--	local eventType = 10
+	--	local dest = -1
+	--	local source = M:getGUIDtoNumber(UnitGUID(unit))
+	--	if (not source) then source = 0 end
+	--	local time = 0
 
-	-- PvP Trinket
-	if spellid == 42292 then
-		
-		local eventType = 10
-		local dest = -1
-		local source = M:getGUIDtoNumber(UnitGUID(unit))
-		if (not source) then source = 0 end
-		local time = 0
-
-		-- if AAV_DEBUG_MODE then
-		-- 	-- print("--aav message:")
-		-- 	-- print(self:getDiffTime())
-		-- 	-- print(eventType)
-		-- 	-- print(source)
-		-- 	-- print(dest)
-		-- 	-- print(spellid)
-		-- 	-- print(time)
-		-- 	print("-- unit used pvp trinket --")
-		-- 	print(GetUnitName(unit, true))
-		-- 	print(unit)
-		-- end
-		self:createMessage(self:getDiffTime(), eventType .. "," .. source .. "," .. dest .. "," .. spellid .. "," .. time)
-	end
+	--	-- if AAV_DEBUG_MODE then
+	--	-- 	-- print("--aav message:")
+	--	-- 	-- print(self:getDiffTime())
+	--	-- 	-- print(eventType)
+	--	-- 	-- print(source)
+	--	-- 	-- print(dest)
+	--	-- 	-- print(spellid)
+	--	-- 	-- print(time)
+	--	-- 	print("-- unit used pvp trinket --")
+	--	-- 	print(GetUnitName(unit, true))
+	--	-- 	print(unit)
+	--	-- end
+	--	self:createMessage(self:getDiffTime(), eventType .. "," .. source .. "," .. dest .. "," .. spellid .. "," .. time)
+	--end
 end
 
 function atroxArenaViewer:COMBAT_LOG_EVENT_UNFILTERED(event)
@@ -1524,7 +1524,8 @@ function atroxArenaViewer:COMBAT_LOG_EVENT_ORIGINAL(event, ...)
 			local target, destTarget = M:getGUIDtoTarget(sourceGUID), ""
 			if (target) then destTarget = M:getGUIDtoNumber(UnitGUID(target .. "target")) end
 			if (not destTarget) then destTarget = source end
-			local _, _, _, _, _, _, casttime = GetSpellInfo(spellId)
+			--local _, _, _, _, _, _, casttime = GetSpellInfo(spellId)
+			local _, _, _, casttime, _, _, _, _ = GetSpellInfo(spellId)
 			local _, duration, _ = GetSpellCooldown(spellId)
 			self:createMessage(self:getDiffTime(), eventType .. "," .. source .. "," .. destTarget .. "," .. spellId .. "," .. casttime .. "," .. duration)
 		end
@@ -1533,7 +1534,7 @@ function atroxArenaViewer:COMBAT_LOG_EVENT_ORIGINAL(event, ...)
 		if (source) then
 			if (not dest) then dest = -1 end
 			local time = 0
-			GetSpellCooldown(spellId)
+			--GetSpellCooldown(spellId)
 			--M:getGUIDtoTarget(sourceGUID)
 			self:createMessage(self:getDiffTime(), eventType .. "," .. source .. "," .. dest .. "," .. spellId .. "," .. time)
 		end
@@ -1605,10 +1606,10 @@ function atroxArenaViewer:COMBAT_LOG_EVENT_ORIGINAL(event, ...)
 end
 
 ----
--- check function whether omitted spellid is in the exceptauras table.
--- @param spellid
+-- check function whether omitted spellId is in the exceptauras table.
+-- @param spellId
 -- @return true if it's excluded and unwanted spell
-function atroxArenaViewer:isExcludedAura(spellid)
+function atroxArenaViewer:isExcludedAura(spellId)
 	for k,v in pairs(exceptauras) do
 		if (spellId == v) then 
 			return true
@@ -1928,7 +1929,7 @@ function atroxArenaViewer:executeMatchData(tick, data)
 		-- spell_aura_applied
 		T:addAura(tonumber(data[3]), tonumber(data[4]), tonumber(data[5]), tonumber(data[6]), tonumber(data[7]))
 		-- if AAV_DEBUG_MODE then
-		-- 	-- INFO: data[3] = playerID, data[4] = spellID, data[5] = 1 or 2 (buff/debuff), data[6] = duration, data[7] = #stacks
+		-- 	-- INFO: data[3] = playerID, data[4] = spellId, data[5] = 1 or 2 (buff/debuff), data[6] = duration, data[7] = #stacks
 		-- 	print("aura_applied ".. tonumber(data[3]) .. ", " .. tonumber(data[4]).. ", ".. tonumber(data[5]) .. ", " .. tonumber(data[6]) .. ", " .. tonumber(data[7]))
 		-- end
 		-- TODO: this may be the place where timers for buffs/debuffs could also be added, because we already got the duration in the data

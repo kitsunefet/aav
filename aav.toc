@@ -1,7 +1,7 @@
 ## Title: AAV - atrox Arena Viewer (Cata Classic)
 ## Author: zwacky (real OG), Skeledurr, Nookyx, tehfet
 ## Interface: 40400
-## Version: 1.4.16
+## Version: 1.4.17
 ## SavedVariables: atroxArenaViewerData
 ## Notes: record and view arena replays.
 

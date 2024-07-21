@@ -39,6 +39,7 @@ function AAV_PlayStub:new()
 	self.calc.debuff = {}
 	self.calc.cc = {}
 	self.calc.cd = {}
+	self.timer = nil
 	
 	----
 	-- these skills won't be shown.
@@ -415,9 +416,7 @@ function AAV_PlayStub:setSeekerTooltip()
 		local elap = elapsed()
 		local done = false
 		
-		if (not atroxArenaViewer:TimeLeft(timer)) then
-			self:handleTimer("start")
-		end
+		self:handleTimer("start")
 		
 		self:setTickTime(elap)
 		self:setTick(1)
@@ -441,12 +440,12 @@ end
 ----
 -- starts or stops the timer.
 -- @param value operation
-function AAV_PlayStub:handleTimer(value)
-	if (value == "stop" and timer and atroxArenaViewer:TimeLeft(timer)) then
-		atroxArenaViewer:CancelTimer(timer)
-		timer = nil
-	elseif (value == "start" and (not timer or (timer and not atroxArenaViewer:TimeLeft(timer)))) then
-		timer = atroxArenaViewer:ScheduleRepeatingTimer("evaluateMatchData", atroxArenaViewerData.defaults.profile.update)
+function AAV_PlayStub:handleTimer(value,reason)
+	if (value == "stop" and self.timer and atroxArenaViewer:TimeLeft(self.timer)) then
+		atroxArenaViewer:CancelTimer(self.timer)
+		self.timer = nil
+	elseif (value == "start" and (not self.timer or (self.timer and not atroxArenaViewer:TimeLeft(self.timer)))) then
+		self.timer = atroxArenaViewer:ScheduleRepeatingTimer("evaluateMatchData", atroxArenaViewerData.defaults.profile.update)
 	end
 end
 
@@ -631,7 +630,7 @@ end
 -- @param cast casting spell
 -- @param targetid target, when -1 then unfilled (AE spells without target)
 -- @param casttime time of cast
-function AAV_PlayStub:addSkillIcon(id, spellid, cast, targetid, casttaim)
+function AAV_PlayStub:addSkillIcon(id, spellid, cast, targetid, casttime)
 
 	-- if AAV_DEBUG_MODE then
 	-- 	print("add skill icon")
@@ -640,25 +639,34 @@ function AAV_PlayStub:addSkillIcon(id, spellid, cast, targetid, casttaim)
 	-- end
 	
 	if (not self.entities[id]) then return end
-	casttime = casttaim
-	--if (not casttime) then _, _, _, _, _, _, casttime = GetSpellInfo(spellid) end
-	
+
 	local target
 	if (targetid == -1) then targetid = nil end
 	if (not self.entities[targetid]) then target = nil else target = self.entities[targetid].data end
 	
-	--check if already exist UsedSkills
-	local found = false
-	
-	if (#self.entities[id].skills < AAV_GUI_MAXUSEDSKILLSOBJECTS) then
-		
-		local us = AAV_UsedSkill:new(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
-		self:noticeToSlide(id)
-		table.insert(self.usedskills, us)
-		table.insert(self.entities[id].skills, us)
+	-- check if spell is casting
+	local isCasting = 0
+	if (cast==false) then
+		for k,v in pairs(self.entities[id].skills) do
+			if (v.cast and v.spellid==spellid) then
+				isCasting = k
+				break
+			end
+		end
+	end
+	if (isCasting>0) then
+		self.entities[id].skills[isCasting]:setValue(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
 	else
-		self:noticeToSlide(id)
-		self.entities[id].skills[AAV_Util:getLatestAlive(self.entities[id].skills)]:setValue(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
+		if (#self.entities[id].skills < AAV_GUI_MAXUSEDSKILLSOBJECTS) then
+		
+			local us = AAV_UsedSkill:new(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
+			self:noticeToSlide(id)
+			table.insert(self.usedskills, us)
+			table.insert(self.entities[id].skills, us)
+		else
+			self:noticeToSlide(id)
+			self.entities[id].skills[AAV_Util:getLatestAlive(self.entities[id].skills)]:setValue(self.entities[id].srange, spellid, cast, #self.entities[id].skills, target)
+		end	
 	end
 end
 
@@ -668,7 +676,6 @@ end
 -- @param dest target id
 -- @param spellid skill that interrupted
 -- @param interrupted the interrupted spell id
--- TODO: not working in TBC classic, because casts are currently not showing a cast time/bar, so isCasting evaluates to false
 function AAV_PlayStub:interruptSkill(source, dest, spellid, interrupted)
 	if (not self.entities[dest]) then return end
 	
@@ -974,6 +981,7 @@ function AAV_PlayStub:handleIndexCreation(val)
 	elseif (val == "stop") then
 		self.indexCycle:SetScript("OnUpdate", function() end)
 		self:handleTimer("start")
+		self:hideMovingObjects()
 		self.loading:Hide()
 	end
 end

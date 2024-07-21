@@ -403,13 +403,13 @@ function AAV_Spec:ScanUnitBuffs(unit)
             break
         end
 
-        local spellID = auraData.spellId
+        local spellId = auraData.spellId
         local unitCaster = auraData.sourceUnit
 
-        if AAV_Spec.specSpells[spellID] and unitCaster then -- Check for auras that detect a spec
+        if AAV_Spec.specSpells[spellId] and unitCaster then -- Check for auras that detect a spec
             local unitPet = string.gsub(unit, "%d$", "pet%1")
             if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
-                AAV_Spec:OnSpecDetected(GetUnitName(unitCaster, true), AAV_Spec.specSpells[spellID])
+                AAV_Spec:OnSpecDetected(GetUnitName(unitCaster, true), AAV_Spec.specSpells[spellId])
             end
         end
     end
