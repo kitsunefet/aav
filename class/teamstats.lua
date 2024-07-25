@@ -90,7 +90,7 @@ function AAV_TeamStats:setValue(parent, teamdata, matchdata, team, bracket)
 			end
 			self.entries[i]["entry"]:Show()
 			self.entries[i]["icon"].texture:SetTexture("Interface\\Addons\\aav\\res\\" .. class .. ".tga")
-			if (w.spec~="nospec" and w.spec~="") then
+			if (w.spec~="nospec" and w.spec~="" and atroxArenaViewerData.defaults.profile.showdetectedspec) then
 				self.entries[i]["icon"].texture:SetTexture("Interface\\Addons\\aav\\res\\spec\\" .. w.spec .. ".tga")
 			end
 			self.entries[i]["name"]:SetText(w.name)

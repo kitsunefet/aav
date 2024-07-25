@@ -98,7 +98,7 @@ function AAV_MatchStub:newDude(unit, team, max)
 	if (self.buffs[id]) then self.buffs[id] = nil else self.buffs[id] = {} end
 	if (self.debuffs[id]) then self.debuffs[id] = nil else self.debuffs[id] = {} end
 	
-	self.combatans.dudes[UnitGUID(unit)].name = UnitName(unit)
+	self.combatans.dudes[UnitGUID(unit)].name, self.combatans.dudes[UnitGUID(unit)].realm = UnitName(unit)
 	_, self.combatans.dudes[UnitGUID(unit)].class = UnitClass(unit)
 	_, self.combatans.dudes[UnitGUID(unit)].race = UnitRace(unit)
 	self.combatans.dudes[UnitGUID(unit)].team = team -- 1 = friendly, 0 = hostile
@@ -133,6 +133,7 @@ function AAV_MatchStub:addDude(key, dude)
 	if (self.debuffs[id]) then self.debuffs[id] = nil else self.debuffs[id] = {} end
 	
 	self.combatans.dudes[key].name = dude.name
+	self.combatans.dudes[key].realm = dude.realm
 	_, self.combatans.dudes[key].class = dude.class
 	_, self.combatans.dudes[key].race = dude.race
 	self.combatans.dudes[key].team = dude.team
@@ -288,6 +289,10 @@ function AAV_MatchStub:setPlayer(guids, playerName, rating, damageDone, healingD
 		guid = guids[playerName]
 	else
 		guid = self:getNametoGUID(playerName) --enemey guid is still present even if they already left
+	end
+
+	if (spec == "auto") then
+		spec = AAV_Spec:GetSpecOrDefault(guid)
 	end
 	
 	self.combatans.dudes[guid].rating = rating -- atm no api to get others rating

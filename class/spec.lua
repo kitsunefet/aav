@@ -409,29 +409,29 @@ function AAV_Spec:ScanUnitBuffs(unit)
         if AAV_Spec.specSpells[spellId] and unitCaster then -- Check for auras that detect a spec
             local unitPet = string.gsub(unit, "%d$", "pet%1")
             if UnitIsUnit(unit, unitCaster) or UnitIsUnit(unitPet, unitCaster) then
-                AAV_Spec:OnSpecDetected(GetUnitName(unitCaster, true), AAV_Spec.specSpells[spellId])
+                AAV_Spec:OnSpecDetected(UnitGUID(unitCaster), AAV_Spec.specSpells[spellId])
             end
         end
     end
 end
 
-function AAV_Spec:OnSpecDetected(unitName, spec)
-    local existingPlayer = AAV_Spec.specTable[unitName]
+function AAV_Spec:OnSpecDetected(UnitGUID, spec)
+    local existingPlayer = AAV_Spec.specTable[UnitGUID]
 
     if existingPlayer then
         return
     end
 
-    AAV_Spec.specTable[unitName] = spec
-    --print(unitName .. " " .. spec)
+    AAV_Spec.specTable[UnitGUID] = spec
+    --print(UnitGUID .. " " .. spec)
 end
 
-function AAV_Spec:GetSpecOrDefault(unitName)
-    if not unitName then
+function AAV_Spec:GetSpecOrDefault(UnitGUID)
+    if not UnitGUID then
         return "nospec"
     end
 
-    local detectedSpec = AAV_Spec.specTable[unitName]
+    local detectedSpec = AAV_Spec.specTable[UnitGUID]
 
     if detectedSpec then
         return detectedSpec

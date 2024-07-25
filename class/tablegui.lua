@@ -137,10 +137,6 @@ function AAV_TableGui:createMatchesTable()
 		-- 	["name"] = "Team",
 		-- 	["width"] = 125,
 		-- }, -- [4]
-		{
-			["name"] = "Team Compositions", -- matchup (class icons)
-			["width"] = 250,
-		}, -- [4]
 		-- {
 		-- 	["name"] = "Enemy Team",
 		-- 	["width"] = 125,
@@ -152,23 +148,27 @@ function AAV_TableGui:createMatchesTable()
 		{
 			["name"] = "Rating",
 			["width"] = 70,
-		}, -- [5]
+		}, -- [4]
 		{
 			["name"] = "MMR",
-			["width"] = 70,
-		}, -- [6]
+			["width"] = 50,
+		}, -- [5]
 		{
-			["name"] = "Enemy Rating",
-			["width"] = 70,
-		}, -- [7]
+			["name"] = "                        Team Compositions", -- matchup (class icons)
+			["width"] = 225,
+		}, -- [6]
+		--{
+		--	["name"] = "Enemy Rating",
+		--	["width"] = 70,
+		--}, -- [7]
 		{
 			["name"] = "Enemy MMR",
-			["width"] = 70,
-		}, -- [8]
+			["width"] = 50,
+		}, -- [7]
 		{
 			["name"] = "Delete",
 			["width"] = 50,
-		}, -- [9]
+		}, -- [8]
 	};
 	matchesTable = ScrollingTable:CreateST(cols, 20, 22, nil, matchesFrame);
 	matchesTable:RegisterEvents({
@@ -185,6 +185,16 @@ function AAV_TableGui:createMatchesTable()
 					atroxArenaViewer:playMatch(realrow)
 				end
 			end
+		end,
+		["OnEnter"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, button, ...)
+			if (row and column and realrow and atroxArenaViewerData and atroxArenaViewerData.data and atroxArenaViewerData.data[realrow]) then
+				if (atroxArenaViewerData.defaults.profile.shownamestooltip) then
+					AAV_Gui:ShowTooltip(cellFrame, data[realrow]['team1'], data[realrow]['team2'], data[realrow]['lose'])
+				end
+			end
+		end,
+		["OnLeave"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, button, ...)
+			AAV_Gui:HideTooltip()
 		end,
 	});
 end
@@ -205,7 +215,7 @@ function AAV_TableGui:fillMatchesTable()
 			end
 			data[row].cols = {};
 			
-			local startTime, elapsedStr, mapname, matchUp, ownTeam, enemyTeam, matchResult, ownTeamRating, ownTeamMMR, ownTeamRatingDiff, enemyTeamRating, enemyTeamMMR, enemyTeamRatingDiff = self:determineMatchSummary(row)
+			local startTime, elapsedStr, mapname, matchUp, ownTeam, enemyTeam, matchResult, ownTeamRating, ownTeamMMR, ownTeamRatingDiff, enemyTeamRating, enemyTeamMMR, enemyTeamRatingDiff, team1, team2 = self:determineMatchSummary(row)
 			local ownDiffPrefix = ""
 			if ownTeamRatingDiff > 0 then
 				ownDiffPrefix = "+"
@@ -214,6 +224,9 @@ function AAV_TableGui:fillMatchesTable()
 			if enemyTeamRatingDiff > 0 then
 				enemyDiffPrefix = "+"
 			end
+			data[row]['team1'] = team1
+			data[row]['team2'] = team2
+			data[row]['lose'] = 0
 			-- start time
 			data[row].cols[1] = { ["value"] = startTime };
 
@@ -225,9 +238,6 @@ function AAV_TableGui:fillMatchesTable()
 
 			-- own team name -> removed for now, no more teams in wotlk (not deleted in case blizzard changes things)
 			-- data[row].cols[4] = { ["value"] = ownTeam };
-			
-			-- matchUp (both teams classes xx vs yy)
-			data[row].cols[4] = { ["value"] = matchUp };
 
 			-- enemy team name -> removed for now, no more teams in wotlk 
 			-- data[row].cols[6] = { ["value"] = enemyTeam};
@@ -236,36 +246,40 @@ function AAV_TableGui:fillMatchesTable()
 			--data[row].cols[7] = { ["value"] = "" };
 
 			-- own team rating + diff
-			data[row].cols[5] = { ["value"] = ownTeamRating .. " (" .. ownDiffPrefix .. ownTeamRatingDiff .. ")" };
+			data[row].cols[4] = { ["value"] = ownTeamRating .. " (" .. ownDiffPrefix .. ownTeamRatingDiff .. ")" };
 
 			-- make the world more colorful
 			if (matchResult and matchResult == "WIN") then
-				data[row].cols[5].color = wonMatchColor
+				data[row].cols[4].color = wonMatchColor
 			elseif (matchResult and matchResult == "LOSS") then
-				data[row].cols[5].color = lostMatchColor
+				data[row].cols[4].color = lostMatchColor
+				data[row]['lose'] = 1
 			else
-				data[row].cols[5].color = unknownMatchColor
+				data[row].cols[4].color = unknownMatchColor
 			end
 
 			-- own team MMR
-			data[row].cols[6] = { ["value"] = ownTeamMMR };
+			data[row].cols[5] = { ["value"] = ownTeamMMR };
 
 			-- enemy team rating
-			data[row].cols[7] = { ["value"] = enemyTeamRating .. " (" .. enemyDiffPrefix .. enemyTeamRatingDiff .. ")" };
+			--data[row].cols[7] = { ["value"] = enemyTeamRating .. " (" .. enemyDiffPrefix .. enemyTeamRatingDiff .. ")" };
+
+			-- matchUp (both teams classes xx vs yy)
+			data[row].cols[6] = { ["value"] = matchUp };
 
 			-- enemy team MMR
-			data[row].cols[8] = { ["value"] = enemyTeamMMR };
+			data[row].cols[7] = { ["value"] = enemyTeamMMR };
 
 			-- delete
-			data[row].cols[9] = { ["value"] = "DELETE" };
-			data[row].cols[9].color = deleteColor
+			data[row].cols[8] = { ["value"] = "DELETE" };
+			data[row].cols[8].color = deleteColor
 
 
 		end
 	else
 		data[1] = {};
 		data[1].cols = {};
-		for i = 1, 9 do
+		for i = 1, 8 do
 			data[1].cols[i] = { ["value"] = "None" }; -- if no data available (empty data)
 		end
 	end
@@ -325,6 +339,7 @@ function AAV_TableGui:determineMatchSummary(num)
 
 	-- set teamOne, teamTwo
 	local teamOne, teamTwo = {}, {}
+	local team1, team2 = {}, {}
 	for k ,v in pairs(teamdata) do
 		local team = k+1
 		local i = 1
@@ -345,8 +360,18 @@ function AAV_TableGui:determineMatchSummary(num)
 				end
 				if (team == 1) then
 					teamOne[idSortStr] = w
+					if (atroxArenaViewerData.defaults.profile.showplayerrealm and w.realm) then
+						table.insert(team1, w.name .. "-" .. w.realm)
+					else
+						table.insert(team1, w.name)
+					end
 				elseif (team == 2) then
 					teamTwo[idSortStr] = w
+					if (atroxArenaViewerData.defaults.profile.showplayerrealm and w.realm) then
+						table.insert(team2, w.name .. "-" .. w.realm)
+					else
+						table.insert(team2, w.name)
+					end
 				end
 			end
 			i = i + 1
@@ -367,7 +392,7 @@ function AAV_TableGui:determineMatchSummary(num)
 			else
 				icon = specIconTable("UNKNOWN")
 			end
-			if (w.spec~="" and w.spec~="nospec") then
+			if (w.spec~="" and w.spec~="nospec" and atroxArenaViewerData.defaults.profile.showdetectedspec) then
 				icon = "\124T" .. "Interface\\Addons\\aav\\res\\spec\\" .. w.spec .. ":22\124t"
 			end
 			sortedNames = sortedNames .. " " .. icon
@@ -375,6 +400,11 @@ function AAV_TableGui:determineMatchSummary(num)
 		return sortedNames
 	end
 	local matchUp = sortNames(teamOne) .. "  vs  " .. sortNames(teamTwo)
+	local teamsize = #team1
+	for i = 1, 5-teamsize, 1 do
+		matchUp = "\124T" .. "Interface\\Addons\\aav\\res\\spec\\" .. "EMPTY_VAL" .. ":22\124t" .. matchUp
+		matchUp = matchUp .. "\124T" .. "Interface\\Addons\\aav\\res\\spec\\" .. "EMPTY_VAL" .. ":22\124t"
+	end
 	
 	-- set ratings, catch nil values (happens e.g. if you leave arena early)
 	if (teamdata[0]["rating"]) then
@@ -397,7 +427,7 @@ function AAV_TableGui:determineMatchSummary(num)
 		enemyTeamRatingDiff = 0
 	end
 
-	return startTime, elapsedStr, mapname, matchUp, ownTeam, enemyTeam, matchResult, ownTeamRating, ownTeamMMR, ownTeamRatingDiff, enemyTeamRating, enemyTeamMMR, enemyTeamRatingDiff
+	return startTime, elapsedStr, mapname, matchUp, ownTeam, enemyTeam, matchResult, ownTeamRating, ownTeamMMR, ownTeamRatingDiff, enemyTeamRating, enemyTeamMMR, enemyTeamRatingDiff, team1, team2
 end
 
 ----

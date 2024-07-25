@@ -75,7 +75,7 @@ end
 function AAV_PlayerEntity:setValue(class, spec, name, maxhp, v)
 	self.data = v
 	self.icon.texture:SetTexture("Interface\\Addons\\aav\\res\\" .. class .. ".tga")
-	if (spec~="" and spec~="nospec") then
+	if (spec~="" and spec~="nospec" and atroxArenaViewerData.defaults.profile.showdetectedspec) then
 		self.icon.texture:SetTexture("Interface\\Addons\\aav\\res\\spec\\" .. spec .. ".tga")
 	end
 	self.name:SetText(name)

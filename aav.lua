@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 17
+AAV_VERSIONBUGFIX = 18
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -162,6 +162,10 @@ function atroxArenaViewer:OnInitialize()
 				hpbartexture = "oCB",
 				manabartexture = "oCB",
 				broadcastannounce = false, --broadcast announce
+				showdetectedspec = true, --show detected spec in match table
+				detectspec = true, --detect and save players spec
+				shownamestooltip = true, --show team names over match table
+				showplayerrealm = true, --adds realm name to player's name
 				healthdisplay = 3, -- deficit percentage
 				shortauras = true, -- don't exceed debuff buff bar
 				uniquecolor = false, -- use class color as hp bar
@@ -169,6 +173,21 @@ function atroxArenaViewer:OnInitialize()
 			}
 		}
 	}
+
+	--set enabled by default
+	if (atroxArenaViewerData.defaults.profile.showdetectedspec ~= false) then
+		atroxArenaViewerData.defaults.profile.showdetectedspec = true
+	end
+	if (atroxArenaViewerData.defaults.profile.detectspec ~= false) then
+		atroxArenaViewerData.defaults.profile.detectspec = true
+	end
+	if (atroxArenaViewerData.defaults.profile.shownamestooltip ~= false) then
+		atroxArenaViewerData.defaults.profile.shownamestooltip = true
+	end
+	if (atroxArenaViewerData.defaults.profile.showplayerrealm ~= false) then
+		atroxArenaViewerData.defaults.profile.showplayerrealm = true
+	end
+
 	atroxArenaViewerData.current = {
 		inArena = false,
 		inFight = false,
@@ -176,6 +195,10 @@ function atroxArenaViewer:OnInitialize()
 		time = 0,
 		move = 0,
 		broadcast = false,
+		showdetectedspec = true, --detect players spec
+		detectspec = true,
+		shownamestooltip = true,
+		showplayerrealm = true,
 		record = true,
 		listening = "",
 		interval = 0.1,
@@ -781,7 +804,12 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 				-- original: M:setPlayer(guids,name, rating, damageDone, healingDone, personalRatingChange, mmr, specName)
 				-- note: rating, personalRatingChange and mmr are not obtainable on a per-player basis in TBC classic, just per-team. so we always set 0 for now
 				-- maybe we'll find some way in the future?
-				M:setPlayer(guids,name, 0, damageDone, healingDone, 0, 0, AAV_Spec:GetSpecOrDefault(name))
+				if (atroxArenaViewerData.defaults.profile.showdetectedspec) then
+					M:setPlayer(guids,name, 0, damageDone, healingDone, 0, 0, "auto")
+				else
+					M:setPlayer(guids,name, 0, damageDone, healingDone, 0, 0, "nospec")
+				end
+					
 			end
 			
 			if (atroxArenaViewerData.current.broadcast) then
@@ -923,22 +951,25 @@ end
 -- @param other
 -- TBC Classic: removed, spec cannot be obtained via API. could only guess by presence of certain spec specific buffs like Gladdy does, but will not implement this here for now.
 function atroxArenaViewer:INSPECT_READY(event, guid, other)
-	if(M and M:getDudesData()[guid]) then
-		for i = 1, 5 do
-			if (UnitExists("raid" .. i)) then
-				if(guid == UnitGUID("raid" .. i)) then --should only happen once
-					if(M:getDudesData()[guid].spec == nil or strlen(M:getDudesData()[guid].spec) == 0) then
-						local specID = 0 --GetInspectSpecialization("raid" .. i)
-						local specName = "nospec" --GetSpecializationInfoByID(specID)
-						if(specName) then 
-							M.combatans.dudes[guid].spec = specName
-						end
-					end
-					if(i<5) then NotifyInspect("raid" .. i+1) end
-				end
-			end
-		end
-	end
+	--if guid then 
+	--	if(M and M:getDudesData()[guid]) then
+	--		for i = 1, 5 do
+	--			if (UnitExists("raid" .. i)) then
+	--				if(guid == UnitGUID("raid" .. i)) then --should only happen once
+	--					AAV_Spec:ScanUnitBuffs("raid" .. i)
+	--					--if(M:getDudesData()[guid].spec == nil or strlen(M:getDudesData()[guid].spec) == 0) then
+	--					--	local specID = 0 --GetInspectSpecialization("raid" .. i)
+	--					--	local specName = "nospec" --GetSpecializationInfoByID(specID)
+	--					--	if(specName) then 
+	--					--		M.combatans.dudes[guid].spec = specName
+	--					--	end
+	--					--end
+	--					if(i<5) then NotifyInspect("raid" .. i+1) end
+	--				end
+	--			end
+	--		end
+	--	end
+	--end
 end
 
 function atroxArenaViewer:ZONE_CHANGED_NEW_AREA(event, unit)	
@@ -1184,7 +1215,9 @@ end
 
 function atroxArenaViewer:UNIT_AURA(event, unit)
 
-	AAV_Spec:ScanUnitBuffs(unit)
+	if (atroxArenaViewerData.defaults.profile.detectspec) then
+		AAV_Spec:ScanUnitBuffs(unit)
+	end
 
 	local n, m = 1, 1
 	local sub = string.sub(unit,1,4)
@@ -1285,31 +1318,33 @@ function atroxArenaViewer:UNIT_AURA(event, unit)
 end
 
 function atroxArenaViewer:UNIT_SPELLCAST_START(event, unit, castGUID)
-    local spellName, _, _, _, _, _, _, _, spellId = CastingInfo(event)
+	if (atroxArenaViewerData.defaults.profile.detectspec) then
+		local spellName, _, _, _, _, _, _, _, spellId = CastingInfo(event)
 
-    if event then
-        AAV_Spec:ScanUnitBuffs(unit)
-    end
+		if event then
+			AAV_Spec:ScanUnitBuffs(unit)
+		end
 
-    if spellName then
-        if AAV_Spec.specSpells[spellId] and event then
-            local name = GetUnitName(unit, true)
-            self:OnSpecDetected(name, AAV_Spec.specSpells[spellId])
-        end
-    end
+		if spellName then
+			if AAV_Spec.specSpells[spellId] and event then
+				self:OnSpecDetected(UnitGUID(unit), AAV_Spec.specSpells[spellId])
+			end
+		end
+	end
 end
 
 function atroxArenaViewer:UNIT_SPELLCAST_CHANNEL_START(event, unit, castGuid, spellId)
-    if unit then 
-        AAV_Spec:ScanUnitBuffs(unit)
-    end
+	if (atroxArenaViewerData.defaults.profile.detectspec) then
+		if unit then 
+			AAV_Spec:ScanUnitBuffs(unit)
+		end
 
-    if spellId then
-        if AAV_Spec.specSpells[spellId] and unit then
-            local name = GetUnitName(unit, true)
-            self:OnSpecDetected(name, AAV_Spec.specSpells[spellId])
-        end
-    end
+		if spellId then
+			if AAV_Spec.specSpells[spellId] and unit then
+				self:OnSpecDetected(UnitGUID(unit), AAV_Spec.specSpells[spellId])
+			end
+		end
+	end
 end
 
 ----
@@ -1336,7 +1371,7 @@ function atroxArenaViewer:UNIT_NAME_UPDATE(event, unit)
 				end
 				if((UnitName(unit) ~= nil) and (sourceGUID ~= nil) and (unit ~= nil) and (atroxArenaViewerData.current.inArena)) then
 					if (M:getDudesData()[sourceGUID]) then
-						M:getDudesData()[sourceGUID].name = UnitName(unit)
+						M:getDudesData()[sourceGUID].name, M:getDudesData()[sourceGUID].realm = UnitName(unit)
 						self:sendPlayerInfo(sourceGUID, M:getDudesData()[sourceGUID])
 					end
 				else
@@ -1353,14 +1388,16 @@ end
 
 function atroxArenaViewer:ARENA_OPPONENT_UPDATE(event, unit, type)
 	local u = M:getGUIDtoNumber(UnitGUID(unit))
-	AAV_Spec:ScanUnitBuffs(unit)
 	
 	if (type == "seen") then
 		if (not u) then
 			local key, player = M:updateMatchPlayers(2, unit)
 			self:sendPlayerInfo(key, player)
 			if (UnitIsPlayer(unit)) then
-				M:SetOpponentSpec(UnitGUID(unit), strsub(unit, strlen(unit))) --TODO
+				--M:SetOpponentSpec(UnitGUID(unit), strsub(unit, strlen(unit))) --TODO
+				if (atroxArenaViewerData.defaults.profile.detectspec) then
+					AAV_Spec:ScanUnitBuffs(unit)
+				end
 			end
 			
 			--self:ScheduleTimer("initArenaMatchUnits", AAV_INITOFFTIME, {unit, 2})
@@ -1398,16 +1435,17 @@ end
 -- got the idea how to handle this from Omnibar, credits to Omnibars developer!
 function atroxArenaViewer:UNIT_SPELLCAST_SUCCEEDED(event,unit,_,spellid)
 
-	if unit then
-        AAV_Spec:ScanUnitBuffs(unit)
-    end
+	if (atroxArenaViewerData.defaults.profile.detectspec) then
+		if unit then
+			AAV_Spec:ScanUnitBuffs(unit)
+		end
 
-    if spellid then
-        if AAV_Spec.specSpells[spellid] and unit then
-            local name = GetUnitName(unit, true)
-            AAV_Spec:OnSpecDetected(name, AAV_Spec.specSpells[spellid])
-        end
-    end
+		if spellid then
+			if AAV_Spec.specSpells[spellid] and unit then
+				AAV_Spec:OnSpecDetected(UnitGUID(unit), AAV_Spec.specSpells[spellid])
+			end
+		end
+	end
 
 	-- filter out spell event from player (self), because we also get an event from raid1/party1 etc.
 	-- filter out spell event from target, because we also get an event from raid1/party1/arena1 etc.

@@ -1,6 +1,7 @@
 
+local _G = _G
 local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
-
+local AceGUI = _G.LibStub("AceGUI-3.0")
 AAV_Gui = {}
 AAV_Gui.__index = AAV_Gui
 
@@ -146,7 +147,7 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	else
 		t:SetTexture("Interface\\Addons\\aav\\res\\" .. v.class .. ".tga")
 	end
-	if (v.spec ~= "" and v.spec ~= "nospec") then
+	if (v.spec ~= "" and v.spec ~= "nospec" and atroxArenaViewerData.defaults.profile.showdetectedspec) then
 		t:SetTexture("Interface\\Addons\\aav\\res\\spec\\" .. v.spec .. ".tga")
 	end
 	t:SetAllPoints(c)
@@ -1088,6 +1089,65 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				UIDropDownMenu_AddButton(info, level)
 				
 				reset(info)
+				info.text = "Detect player specs"
+				info.notCheckable = false
+				info.notClickable = false
+				info.hasArrow = false
+				info.checked = atroxArenaViewerData.defaults.profile.detectspec
+				info.func = function() atroxArenaViewerData.defaults.profile.detectspec = not atroxArenaViewerData.defaults.profile.detectspec end
+				
+				UIDropDownMenu_AddButton(info, level)
+
+				reset(info)
+				info.notCheckable = true
+				info.notClickable = true
+				info.text = ""
+				
+				UIDropDownMenu_AddButton(info, level)
+
+				reset(info)
+				info.text = "GUI settings"
+				info.notCheckable = true
+				info.notClickable = true
+				info.hasArrow = false
+				info.func = nil
+				info.r = 0.8901960784313725
+				info.g = 0.5725490196078431
+				info.b = 0.7725490196078431
+
+				UIDropDownMenu_AddButton(info, level)
+
+				reset(info)
+				info.text = "Show detected specs"
+				info.notCheckable = false
+				info.notClickable = false
+				info.hasArrow = false
+				info.checked = atroxArenaViewerData.defaults.profile.showdetectedspec
+				info.func = function() atroxArenaViewerData.defaults.profile.showdetectedspec = not atroxArenaViewerData.defaults.profile.showdetectedspec end
+				
+				UIDropDownMenu_AddButton(info, level)
+				
+				reset(info)
+				info.text = "Show tooltip with names"
+				info.notCheckable = false
+				info.notClickable = false
+				info.hasArrow = false
+				info.checked = atroxArenaViewerData.defaults.profile.shownamestooltip
+				info.func = function() atroxArenaViewerData.defaults.profile.shownamestooltip = not atroxArenaViewerData.defaults.profile.shownamestooltip end
+				
+				UIDropDownMenu_AddButton(info, level)
+
+				reset(info)
+				info.text = "Show player's realm in tooltip"
+				info.notCheckable = false
+				info.notClickable = false
+				info.hasArrow = false
+				info.checked = atroxArenaViewerData.defaults.profile.showplayerrealm
+				info.func = function() atroxArenaViewerData.defaults.profile.showplayerrealm = not atroxArenaViewerData.defaults.profile.showplayerrealm end
+				
+				UIDropDownMenu_AddButton(info, level)
+
+				reset(info)
 				info.notCheckable = true
 				info.notClickable = true
 				info.text = ""
@@ -1460,3 +1520,19 @@ function AAV_Gui:createCC(parent, id)
 	return f, n
 	
 end
+
+function AAV_Gui:ShowTooltip(owner, teamPlayerNames, enemyPlayerNames, lose)
+    AceGUI.tooltip:SetOwner(owner, "ANCHOR_TOP")
+    AceGUI.tooltip:ClearLines()
+    AceGUI.tooltip:AddLine(L["Names"])
+    for i, name in ipairs(teamPlayerNames) do
+        AceGUI.tooltip:AddLine(name, lose-0, 1-lose, 0)
+    end
+    AceGUI.tooltip:AddLine('---------------')
+    for i, name in ipairs(enemyPlayerNames) do
+        AceGUI.tooltip:AddLine(name, 1-lose, lose-0, 0)
+    end
+    AceGUI.tooltip:Show()
+end
+
+function AAV_Gui:HideTooltip() AceGUI.tooltip:Hide() end

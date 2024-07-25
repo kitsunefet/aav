@@ -14,7 +14,7 @@ If you ever wanted to analyze your arena matches, why you died on that particula
 Features
 ---
 * record, replay, delete arena matches
-* broadcast arena matches to guild mates
+* broadcast arena matches to guild mates (currently broken)
 * see used skills
 * casting bar
 * cooldown bar
@@ -46,10 +46,10 @@ Known Bugs
 * interrupts do not always show ("X") on interrupted spell in play match window
 * sometimes while in arena a LUA error keeps popping up every second, has something to do with spell auras. need to analyze further
 * skirmish games are not recorded properly while broadcasting at the same time
+* broadcasting is broken due to new limitations in message throttle mechanism 
 
 Ideas for further improvement (volunteers are very welcome to create pull requests)
 ---
-* detect talent spec by skills that are only available for specific specs (e.g. ice barrier = frost mage)
 * show the duration of buffs/debuffs on targets (currently only done for CC spells)
 
 Possible features that are currently not planned to be implemented:
