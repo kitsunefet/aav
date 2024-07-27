@@ -37,7 +37,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 18
+AAV_VERSIONBUGFIX = 19
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -1327,7 +1327,7 @@ function atroxArenaViewer:UNIT_SPELLCAST_START(event, unit, castGUID)
 
 		if spellName then
 			if AAV_Spec.specSpells[spellId] and event then
-				self:OnSpecDetected(UnitGUID(unit), AAV_Spec.specSpells[spellId])
+				AAV_Spec:OnSpecDetected(UnitGUID(unit), AAV_Spec.specSpells[spellId])
 			end
 		end
 	end
@@ -1341,7 +1341,7 @@ function atroxArenaViewer:UNIT_SPELLCAST_CHANNEL_START(event, unit, castGuid, sp
 
 		if spellId then
 			if AAV_Spec.specSpells[spellId] and unit then
-				self:OnSpecDetected(UnitGUID(unit), AAV_Spec.specSpells[spellId])
+				AAV_Spec:OnSpecDetected(UnitGUID(unit), AAV_Spec.specSpells[spellId])
 			end
 		end
 	end
