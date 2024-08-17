@@ -7,7 +7,7 @@ function AAV_MatchStub:new()
 	setmetatable(self, AAV_MatchStub)
 	
 	self.version = AAV_VERSIONMAJOR .. "." .. AAV_VERSIONMINOR .. "." .. AAV_VERSIONBUGFIX
-	self.startTime = atroxArenaViewerData.current.entered
+	self.startTime = _atroxArenaViewerData.current.entered
 	self.endTime = ""
 	self.elapsed = 0
 	self.bracket = 0
@@ -53,9 +53,21 @@ function AAV_MatchStub:saveToVariable(matchid)
 
 	for k,v in pairs(self) do
 		if (k ~= "buffs" and k ~= "debuffs") then
-			atroxArenaViewerData.data[matchid][k] = v
+			_atroxArenaViewerMatchData[matchid][k] = v
 		end
 	end
+	AAV_DB[matchid] = AAV_DB[matchid] or {}
+	local v_info = {}
+	for i,j in pairs(_atroxArenaViewerMatchData[matchid]) do
+		if i=='data' then
+			local compressed_data = atroxArenaViewer:Archive(j)
+			AAV_DB[matchid]['data'] = compressed_data
+			_atroxArenaViewerMatchData[matchid]['data'] = compressed_data
+		else
+			v_info[i] = j
+		end
+	end
+	AAV_DB[matchid]['info'] = atroxArenaViewer:Archive(v_info)
 
 end
 
@@ -117,7 +129,7 @@ function AAV_MatchStub:newDude(unit, team, max)
 	self.combatans.dudes[UnitGUID(unit)].rating = 0
 	self.combatans.dudes[UnitGUID(unit)].hCritName = "Unknown"
 	
-	if (atroxArenaViewerData.current.broadcast) then
+	if (_atroxArenaViewerData.current.broadcast) then
 		
 	end
 	return UnitGUID(unit), self.combatans.dudes[UnitGUID(unit)]
@@ -367,6 +379,6 @@ end
 -- creates a message and saves it.
 -- @param msg message string
 function AAV_MatchStub:createMessage(msg)
-	atroxArenaViewerData.current.move = atroxArenaViewerData.current.move + 1
-	self.data[atroxArenaViewerData.current.move] = msg
+	_atroxArenaViewerData.current.move = _atroxArenaViewerData.current.move + 1
+	self.data[_atroxArenaViewerData.current.move] = msg
 end

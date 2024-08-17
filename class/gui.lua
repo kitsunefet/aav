@@ -63,7 +63,7 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 	local l = CreateFrame("STATUSBAR", "$parentLoading", o, BackdropTemplateMixin and "BackdropTemplate")
 	l:SetWidth(150)
 	l:SetPoint("CENTER", o:GetName(), 0, 0)
-	l:SetStatusBarTexture("Interface\\Addons\\aav\\res\\" .. atroxArenaViewerData.defaults.profile.hpbartexture .. ".tga")
+	l:SetStatusBarTexture("Interface\\Addons\\aav\\res\\" .. _atroxArenaViewerData.defaults.profile.hpbartexture .. ".tga")
 	l:SetHeight(30)
 	l:SetMinMaxValues(0, 100)
 	l:SetValue(50)
@@ -85,7 +85,7 @@ function AAV_Gui:createPlayerFrame(obj, bracket)
 		obj:hidePlayer(s:GetParent())
 		obj:hideMovingObjects()
 		atroxArenaViewer:stopListening()
-		atroxArenaViewerData.current.listening = ""
+		_atroxArenaViewerData.current.listening = ""
 		obj:setOnUpdate("stop")
 	end)
 	btn:Show()
@@ -147,7 +147,7 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	else
 		t:SetTexture("Interface\\Addons\\aav\\res\\" .. v.class .. ".tga")
 	end
-	if (v.spec ~= "" and v.spec ~= "nospec" and atroxArenaViewerData.defaults.profile.showdetectedspec) then
+	if (v.spec ~= "" and v.spec ~= "nospec" and _atroxArenaViewerData.defaults.profile.showdetectedspec) then
 		t:SetTexture("Interface\\Addons\\aav\\res\\spec\\" .. v.spec .. ".tga")
 	end
 	t:SetAllPoints(c)
@@ -161,7 +161,7 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	local b = CreateFrame("STATUSBAR", "$parentHealthBar", a)
 	b:SetWidth(135)
 	if (manauser) then b:SetHeight(AAV_GUI_HEALTHBARHEIGHT - AAV_GUI_MANABARHEIGHT) else b:SetHeight(AAV_GUI_HEALTHBARHEIGHT) end
-	b:SetStatusBarTexture("Interface\\Addons\\aav\\res\\" .. atroxArenaViewerData.defaults.profile.hpbartexture .. ".tga")
+	b:SetStatusBarTexture("Interface\\Addons\\aav\\res\\" .. _atroxArenaViewerData.defaults.profile.hpbartexture .. ".tga")
 	--b:SetStatusBarColor(AAV_Util:getTargetColor(v, false))
 	b:SetMinMaxValues(0, UnitHealth("player"))
 	b:SetPoint("TOPLEFT", a:GetName(), 30, 1)
@@ -177,7 +177,7 @@ function AAV_Gui:createEntityBar(parent, v, y)
 	local m = CreateFrame("STATUSBAR", "$parentManaBar", a)
 	m:SetWidth(135)
 	m:SetHeight(AAV_GUI_MANABARHEIGHT)
-	m:SetStatusBarTexture("Interface\\Addons\\aav\\res\\" .. atroxArenaViewerData.defaults.profile.manabartexture .. ".tga")
+	m:SetStatusBarTexture("Interface\\Addons\\aav\\res\\" .. _atroxArenaViewerData.defaults.profile.manabartexture .. ".tga")
 	--m:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	m:SetMinMaxValues(0,100)
 	
@@ -367,9 +367,9 @@ function AAV_Gui:createSeekerBar(parent, elapsed)
 	slider:SetScript("OnValueChanged", function(s)
 		speed:SetText(string.format("%.2f",s:GetValue()) .. "%")
 		if (s:GetValue()>0) then 
-			atroxArenaViewerData.current.interval = s:GetValue() / 1000
+			_atroxArenaViewerData.current.interval = s:GetValue() / 1000
 		else
-			atroxArenaViewerData.current.interval = 0
+			_atroxArenaViewerData.current.interval = 0
 		end
 	end)
 	
@@ -766,8 +766,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 	button:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
 	
 	local x,y
-	if (atroxArenaViewerData.defaults.profile.minimapx and atroxArenaViewerData.defaults.profile.minimapy) then
-		x, y = atroxArenaViewerData.defaults.profile.minimapx, atroxArenaViewerData.defaults.profile.minimapy
+	if (_atroxArenaViewerData.defaults.profile.minimapx and _atroxArenaViewerData.defaults.profile.minimapy) then
+		x, y = _atroxArenaViewerData.defaults.profile.minimapx, _atroxArenaViewerData.defaults.profile.minimapy
 	else
 		x, y = -54.6, 58.8
 	end
@@ -830,8 +830,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				y = math.max(-80, math.min(y*diagRadius, 80))
 			end
 			self:SetPoint("CENTER", self:GetParent(), "CENTER", x, y)
-			atroxArenaViewerData.defaults.profile.minimapx = x
-			atroxArenaViewerData.defaults.profile.minimapy = y
+			_atroxArenaViewerData.defaults.profile.minimapx = x
+			_atroxArenaViewerData.defaults.profile.minimapy = y
 		end)
 		GameTooltip:Hide()
 	end)
@@ -875,7 +875,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 			info.notCheckable = false
 			info.notClickable = false
 			info.hasArrow	= false
-			info.checked	= atroxArenaViewerData.current.record
+			info.checked	= _atroxArenaViewerData.current.record
 			info.func       = function() parent:changeRecording() end
 			
 			UIDropDownMenu_AddButton(info, level)
@@ -886,7 +886,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 			info.notCheckable = false
 			info.notClickable = false
 			info.hasArrow	= false
-			info.checked	= atroxArenaViewerData.current.broadcast
+			info.checked	= _atroxArenaViewerData.current.broadcast
 			info.func       = function() parent:changeBroadcast() end
 			UIDropDownMenu_AddButton(info, level)
 			info.checked	= nil
@@ -948,9 +948,9 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				-- PLAY MATCH
 				
 				--[[
-				if (atroxArenaViewerData.data) then
+				if (_atroxArenaViewerMatchData) then
 					
-					for i=1, math.ceil(#atroxArenaViewerData.data / 20) do
+					for i=1, math.ceil(#_atroxArenaViewerMatchData / 20) do
 						reset(info)
 						info.text = "Play Match " .. ((i-1) * 20)+1 .. "-" .. (i * 20)
 						info.notCheckable = true
@@ -973,8 +973,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				end
 				--]]
 				
-				if (atroxArenaViewerData.data) then
-					for k,v in pairs(atroxArenaViewerData.data) do
+				if (_atroxArenaViewerMatchData) then
+					for k,v in pairs(_atroxArenaViewerMatchData) do
 						info.text = k .. " - " .. v.map .. " (" .. v.startTime .. ")"
 						info.notCheckable = true
 						info.notClickable = false
@@ -1005,8 +1005,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notClickable = false
 				info.hasArrow = false
 				info.func = function()
-					while(#atroxArenaViewerData.data>0) do
-						atroxArenaViewer:deleteMatch(#atroxArenaViewerData.data)					
+					while(#_atroxArenaViewerMatchData>0) do
+						atroxArenaViewer:deleteMatch(#_atroxArenaViewerMatchData)					
 					end
 					AAV_TableGui:refreshMatchesFrame()
 				end
@@ -1014,8 +1014,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				UIDropDownMenu_AddButton(info, level)
 				--]]	
 			
-				if (atroxArenaViewerData.data) then
-					for k,v in pairs(atroxArenaViewerData.data) do
+				if (_atroxArenaViewerMatchData) then
+					for k,v in pairs(_atroxArenaViewerMatchData) do
 						reset(info)
 						info.text = k .. " - " .. v.map .. " (" .. v.startTime .. ")"
 						info.notCheckable = true
@@ -1031,7 +1031,7 @@ function AAV_Gui:createMinimapIcon(parent, player)
 					info.notCheckable = true
 					info.notClickable = false
 					info.hasArrow = false
-					info.func = function() for i=1,#atroxArenaViewerData.data do parent:deleteMatch(1) end end
+					info.func = function() for i=1,#_atroxArenaViewerMatchData do parent:deleteMatch(1) end end
 					
 					UIDropDownMenu_AddButton(info, level)
 					
@@ -1083,8 +1083,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.broadcastannounce
-				info.func = function() atroxArenaViewerData.defaults.profile.broadcastannounce = not atroxArenaViewerData.defaults.profile.broadcastannounce end
+				info.checked = _atroxArenaViewerData.defaults.profile.broadcastannounce
+				info.func = function() _atroxArenaViewerData.defaults.profile.broadcastannounce = not _atroxArenaViewerData.defaults.profile.broadcastannounce end
 				
 				UIDropDownMenu_AddButton(info, level)
 				
@@ -1093,8 +1093,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.detectspec
-				info.func = function() atroxArenaViewerData.defaults.profile.detectspec = not atroxArenaViewerData.defaults.profile.detectspec end
+				info.checked = _atroxArenaViewerData.defaults.profile.detectspec
+				info.func = function() _atroxArenaViewerData.defaults.profile.detectspec = not _atroxArenaViewerData.defaults.profile.detectspec end
 				
 				UIDropDownMenu_AddButton(info, level)
 
@@ -1122,8 +1122,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.showdetectedspec
-				info.func = function() atroxArenaViewerData.defaults.profile.showdetectedspec = not atroxArenaViewerData.defaults.profile.showdetectedspec end
+				info.checked = _atroxArenaViewerData.defaults.profile.showdetectedspec
+				info.func = function() _atroxArenaViewerData.defaults.profile.showdetectedspec = not _atroxArenaViewerData.defaults.profile.showdetectedspec end
 				
 				UIDropDownMenu_AddButton(info, level)
 				
@@ -1132,8 +1132,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.shownamestooltip
-				info.func = function() atroxArenaViewerData.defaults.profile.shownamestooltip = not atroxArenaViewerData.defaults.profile.shownamestooltip end
+				info.checked = _atroxArenaViewerData.defaults.profile.shownamestooltip
+				info.func = function() _atroxArenaViewerData.defaults.profile.shownamestooltip = not _atroxArenaViewerData.defaults.profile.shownamestooltip end
 				
 				UIDropDownMenu_AddButton(info, level)
 
@@ -1142,8 +1142,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.showplayerrealm
-				info.func = function() atroxArenaViewerData.defaults.profile.showplayerrealm = not atroxArenaViewerData.defaults.profile.showplayerrealm end
+				info.checked = _atroxArenaViewerData.defaults.profile.showplayerrealm
+				info.func = function() _atroxArenaViewerData.defaults.profile.showplayerrealm = not _atroxArenaViewerData.defaults.profile.showplayerrealm end
 				
 				UIDropDownMenu_AddButton(info, level)
 
@@ -1171,8 +1171,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.shortauras
-				info.func = function() atroxArenaViewerData.defaults.profile.shortauras = not atroxArenaViewerData.defaults.profile.shortauras end
+				info.checked = _atroxArenaViewerData.defaults.profile.shortauras
+				info.func = function() _atroxArenaViewerData.defaults.profile.shortauras = not _atroxArenaViewerData.defaults.profile.shortauras end
 				
 				UIDropDownMenu_AddButton(info, level)
 				
@@ -1200,8 +1200,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.uniquecolor
-				info.func = function() atroxArenaViewerData.defaults.profile.uniquecolor = not atroxArenaViewerData.defaults.profile.uniquecolor end
+				info.checked = _atroxArenaViewerData.defaults.profile.uniquecolor
+				info.func = function() _atroxArenaViewerData.defaults.profile.uniquecolor = not _atroxArenaViewerData.defaults.profile.uniquecolor end
 				
 				UIDropDownMenu_AddButton(info, level)
 				
@@ -1229,9 +1229,9 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.healthdisplay == 1
+				info.checked = _atroxArenaViewerData.defaults.profile.healthdisplay == 1
 				info.func = function() 
-					atroxArenaViewerData.defaults.profile.healthdisplay = 1 
+					_atroxArenaViewerData.defaults.profile.healthdisplay = 1 
 					if (atroxArenaViewer:getPlayer()) then atroxArenaViewer:getPlayer():updateHealthtext() end 
 				end
 				
@@ -1242,9 +1242,9 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.healthdisplay == 2
+				info.checked = _atroxArenaViewerData.defaults.profile.healthdisplay == 2
 				info.func = function() 
-					atroxArenaViewerData.defaults.profile.healthdisplay = 2 
+					_atroxArenaViewerData.defaults.profile.healthdisplay = 2 
 					if (atroxArenaViewer:getPlayer()) then atroxArenaViewer:getPlayer():updateHealthtext() end 
 				end
 				
@@ -1255,9 +1255,9 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.defaults.profile.healthdisplay == 3
+				info.checked = _atroxArenaViewerData.defaults.profile.healthdisplay == 3
 				info.func = function() 
-					atroxArenaViewerData.defaults.profile.healthdisplay = 3 
+					_atroxArenaViewerData.defaults.profile.healthdisplay = 3 
 					if (atroxArenaViewer:getPlayer()) then atroxArenaViewer:getPlayer():updateHealthtext() end 
 				end
 				
@@ -1287,9 +1287,9 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.current.communication == "GUILD"
+				info.checked = _atroxArenaViewerData.current.communication == "GUILD"
 				info.func = function()
-					atroxArenaViewerData.current.communication = "GUILD"
+					_atroxArenaViewerData.current.communication = "GUILD"
 				end
 				
 				UIDropDownMenu_AddButton(info, level)
@@ -1299,9 +1299,9 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				info.notCheckable = false
 				info.notClickable = false
 				info.hasArrow = false
-				info.checked = atroxArenaViewerData.current.communication == "RAID"
+				info.checked = _atroxArenaViewerData.current.communication == "RAID"
 				info.func = function() 
-					atroxArenaViewerData.current.communication = "RAID"
+					_atroxArenaViewerData.current.communication = "RAID"
 				end
 				
 				UIDropDownMenu_AddButton(info, level)
@@ -1309,9 +1309,9 @@ function AAV_Gui:createMinimapIcon(parent, player)
 			elseif (UIDROPDOWNMENU_MENU_VALUE == "Export match") then
 				-- PLAY MATCH
 				--[[
-				if (atroxArenaViewerData.data) then
+				if (_atroxArenaViewerMatchData) then
 					
-					for i=1, math.ceil(#atroxArenaViewerData.data / 20) do
+					for i=1, math.ceil(#_atroxArenaViewerMatchData / 20) do
 						reset(info)
 						info.text = "Export Match " .. ((i-1) * 20)+1 .. "-" .. (i * 20)
 						info.notCheckable = true
@@ -1334,8 +1334,8 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				end
 				--]]
 				
-				if (atroxArenaViewerData.data) then
-					for k,v in pairs(atroxArenaViewerData.data) do
+				if (_atroxArenaViewerMatchData) then
+					for k,v in pairs(_atroxArenaViewerMatchData) do
 						reset(info)
 						info.text = k .. " - " .. v.map .. " (" .. v.startTime .. ")"
 						info.notCheckable = true
@@ -1361,26 +1361,26 @@ function AAV_Gui:createMinimapIcon(parent, player)
 		
 		if (level == 3) then
 			
-			for i=1, math.ceil(#atroxArenaViewerData.data / 20) do
+			for i=1, math.ceil(#_atroxArenaViewerMatchData / 20) do
 				
 --[[				if (UIDROPDOWNMENU_MENU_VALUE == "Play Match " .. ((i-1) * 20)+1 .. "-" .. (i * 20)) then
 					
-					if (atroxArenaViewerData.data) then
+					if (_atroxArenaViewerMatchData) then
 						for j=((i-1)*20)+1, (i*20) do
-							if (not atroxArenaViewerData.data[j]) then break end
+							if (not _atroxArenaViewerMatchData[j]) then break end
 							reset(info)
 							local mapname = ""
-							if (type(atroxArenaViewerData.data[j]["map"])=="number") then
-								if (AAV_COMM_MAPS[atroxArenaViewerData.data[j]["map"]]--) then
---[[									mapname = AAV_COMM_MAPS[atroxArenaViewerData.data[j]["map"]]
+							if (type(_atroxArenaViewerMatchData[j]["map"])=="number") then
+								if (AAV_COMM_MAPS[_atroxArenaViewerMatchData[j]["map"]]--) then
+--[[									mapname = AAV_COMM_MAPS[_atroxArenaViewerMatchData[j]["map"]]
 --[[								else
 									mapname = "Unknown"
 								end
 							else
-								mapname = atroxArenaViewerData.data[j]["map"]
+								mapname = _atroxArenaViewerMatchData[j]["map"]
 							end
-							if (mapname == nil) then print(atroxArenaViewerData.data[j]["map"]) end
-							info.text = j .. " - " .. mapname .. " (" .. atroxArenaViewerData.data[j]["startTime"] .. ")"
+							if (mapname == nil) then print(_atroxArenaViewerMatchData[j]["map"]) end
+							info.text = j .. " - " .. mapname .. " (" .. _atroxArenaViewerMatchData[j]["startTime"] .. ")"
 							info.notCheckable = true
 							info.notClickable = false
 							info.hasArrow = false
@@ -1402,21 +1402,21 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				
 				if (UIDROPDOWNMENU_MENU_VALUE == "Delete Match " .. ((i-1) * 20)+1 .. "-" .. (i * 20)) then
 					
-					if (atroxArenaViewerData.data) then
+					if (_atroxArenaViewerMatchData) then
 						for j=((i-1)*20)+1, (i*20) do
-							if (not atroxArenaViewerData.data[j]) then break end
+							if (not _atroxArenaViewerMatchData[j]) then break end
 							reset(info)
 							local mapname = ""
-							if (type(atroxArenaViewerData.data[j]["map"])=="number") then
-								if (AAV_COMM_MAPS[atroxArenaViewerData.data[j]["map"]]--) then
---[[									mapname = AAV_COMM_MAPS[atroxArenaViewerData.data[j]["map"]]
+							if (type(_atroxArenaViewerMatchData[j]["map"])=="number") then
+								if (AAV_COMM_MAPS[_atroxArenaViewerMatchData[j]["map"]]--) then
+--[[									mapname = AAV_COMM_MAPS[_atroxArenaViewerMatchData[j]["map"]]
 --[[								else
 									mapname = "Unknown"
 								end
 							else
-								mapname = atroxArenaViewerData.data[j]["map"]
+								mapname = _atroxArenaViewerMatchData[j]["map"]
 							end
-							info.text = j .. " - " .. mapname .. " (" .. atroxArenaViewerData.data[j]["startTime"] .. ")"
+							info.text = j .. " - " .. mapname .. " (" .. _atroxArenaViewerMatchData[j]["startTime"] .. ")"
 							info.notCheckable = true
 							info.notClickable = false
 							info.hasArrow = false
@@ -1448,11 +1448,11 @@ function AAV_Gui:createMinimapIcon(parent, player)
 				
 				if (UIDROPDOWNMENU_MENU_VALUE == "Export Match " .. ((i-1) * 20)+1 .. "-" .. (i * 20)) then
 					
-					if (atroxArenaViewerData.data) then
+					if (_atroxArenaViewerMatchData) then
 						for j=((i-1)*20)+1, (i*20) do
-							if (not atroxArenaViewerData.data[j]) then break end
+							if (not _atroxArenaViewerMatchData[j]) then break end
 							reset(info);
-							info.text = j .. " - " .. atroxArenaViewerData.data[j]["map"] .. " (" .. atroxArenaViewerData.data[j]["startTime"] .. ")"
+							info.text = j .. " - " .. _atroxArenaViewerMatchData[j]["map"] .. " (" .. _atroxArenaViewerMatchData[j]["startTime"] .. ")"
 							info.notCheckable = true
 							info.notClickable = false
 							info.hasArrow = false

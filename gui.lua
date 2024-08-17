@@ -3,7 +3,7 @@ local Player
 
 function createPlayerFrame(num)
 	
-	Player = atroxArenaViewerData.data[num]
+	Player = _atroxArenaViewerMatchData[num]
 	if (not Player) then
 		return
 	end

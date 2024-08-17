@@ -161,8 +161,14 @@ end
 -- sets match data.
 -- @param data whole match data
 function AAV_PlayStub:setMatchData(id)
-	self.data = nil
-	self.data = atroxArenaViewerData.data[id]
+	self.data = {}
+	for k,v in pairs(_atroxArenaViewerMatchData[id]) do
+		if k == 'data' then
+			self.data[k] = atroxArenaViewer:DeArchive(v)
+		else
+			self.data[k] = v 
+		end
+	end
 end
 
 ----
@@ -338,14 +344,14 @@ function AAV_PlayStub:getHealthBarText(id, max)
 	if (value == 0) then
 		txt = "Dead"
 	else
-		if (atroxArenaViewerData.defaults.profile.healthdisplay == 1) then
+		if (_atroxArenaViewerData.defaults.profile.healthdisplay == 1) then
 			local a = (value/max)*100*10
 			local i = string.find(a,"[\.]",1)
 			if (i) then a = tonumber(string.sub(a,1, string.find(a,"[\.]",1)-1)) end
 			txt = (a / 10) .. "%"
-		elseif (atroxArenaViewerData.defaults.profile.healthdisplay == 2) then
+		elseif (_atroxArenaViewerData.defaults.profile.healthdisplay == 2) then
 			txt = value .. " / " .. max
-		elseif (atroxArenaViewerData.defaults.profile.healthdisplay == 3) then
+		elseif (_atroxArenaViewerData.defaults.profile.healthdisplay == 3) then
 			txt = (value - max) .. " / " .. max
 		end
 	
@@ -445,7 +451,7 @@ function AAV_PlayStub:handleTimer(value,reason)
 		atroxArenaViewer:CancelTimer(self.timer)
 		self.timer = nil
 	elseif (value == "start" and (not self.timer or (self.timer and not atroxArenaViewer:TimeLeft(self.timer)))) then
-		self.timer = atroxArenaViewer:ScheduleRepeatingTimer("evaluateMatchData", atroxArenaViewerData.defaults.profile.update)
+		self.timer = atroxArenaViewer:ScheduleRepeatingTimer("evaluateMatchData", _atroxArenaViewerData.defaults.profile.update)
 	end
 end
 
@@ -484,7 +490,7 @@ function AAV_PlayStub:reAdjustTypes()
 			val = AAV_Util:split(self:getIndexValue(self:getTick(), w.ID, "buff"), ',')
 			if (val) then 
 				for a,b in pairs(val) do
-					if (not atroxArenaViewerData.defaults.profile.shortauras or (atroxArenaViewerData.defaults.profile.shortauras and #self.entities[w.ID].buffs <= AAV_MAX_AURASVISIBLE)) then
+					if (not _atroxArenaViewerData.defaults.profile.shortauras or (_atroxArenaViewerData.defaults.profile.shortauras and #self.entities[w.ID].buffs <= AAV_MAX_AURASVISIBLE)) then
 						local temp = {} 
 						temp = AAV_Util:split(b, "/") -- split buff spellid and # stacks from buff table
 						if (temp ~= nil) then
@@ -498,7 +504,7 @@ function AAV_PlayStub:reAdjustTypes()
 			val = AAV_Util:split(self:getIndexValue(self:getTick(), w.ID, "debuff"), ',')
 			if (val) then
 				for a,b in pairs(val) do
-					if (not atroxArenaViewerData.defaults.profile.shortauras or (atroxArenaViewerData.defaults.profile.shortauras and #self.entities[w.ID].buffs <= AAV_MAX_AURASVISIBLE)) then
+					if (not _atroxArenaViewerData.defaults.profile.shortauras or (_atroxArenaViewerData.defaults.profile.shortauras and #self.entities[w.ID].buffs <= AAV_MAX_AURASVISIBLE)) then
 						local temp = {}
 						temp = AAV_Util:split(b, "/") -- split debuff spellid and # stacks from debuff table
 						if (temp ~= nil) then
@@ -871,32 +877,32 @@ function AAV_PlayStub:createPlayer(bracket, elapsed, broadcast)
 		self.speed2:SetText('x2')
 		self.speed3:SetText('x3')
 		self.speed0:SetScript("OnClick", function() 
-			atroxArenaViewerData.current.interval = 0
+			_atroxArenaViewerData.current.interval = 0
 			self.seeker.slide:SetValue(0)
 			speed:SetText("0%")
 		end)
 		self.speed02:SetScript("OnClick", function() 
-			atroxArenaViewerData.current.interval = 20/1000
+			_atroxArenaViewerData.current.interval = 20/1000
 			self.seeker.slide:SetValue(20)
 			speed:SetText("20%")
 		end)
 		self.speed05:SetScript("OnClick", function() 
-			atroxArenaViewerData.current.interval = 50/1000
+			_atroxArenaViewerData.current.interval = 50/1000
 			self.seeker.slide:SetValue(50)
 			speed:SetText("50%")
 		end)
 		self.speed1:SetScript("OnClick", function() 
-			atroxArenaViewerData.current.interval = 100/1000
+			_atroxArenaViewerData.current.interval = 100/1000
 			self.seeker.slide:SetValue(100)
 			speed:SetText("100%")
 		end)
 		self.speed2:SetScript("OnClick", function() 
-			atroxArenaViewerData.current.interval = 200/1000
+			_atroxArenaViewerData.current.interval = 200/1000
 			self.seeker.slide:SetValue(200)
 			speed:SetText("200%")
 		end)
 		self.speed3:SetScript("OnClick", function() 
-			atroxArenaViewerData.current.interval = 300/1000
+			_atroxArenaViewerData.current.interval = 300/1000
 			self.seeker.slide:SetValue(300)
 			speed:SetText("300%")
 		end)
@@ -1016,7 +1022,7 @@ function AAV_PlayStub:handleSeeker(val)
 		self.seeker.slide:SetValue(100)
 		self.seeker.speed:Show()
 		self.seeker.speedval:Show()
-		atroxArenaViewerData.current.interval = 0.1
+		_atroxArenaViewerData.current.interval = 0.1
 	elseif (val == "hide") then
 		self.seeker.bar:Hide()
 		self.seeker.back:Hide()

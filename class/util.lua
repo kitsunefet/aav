@@ -448,7 +448,7 @@ end
 -- @param urgent use class colors
 function AAV_Util:getTargetColor(data, urgent)
 	
-	if (not atroxArenaViewerData.defaults.profile.uniquecolor or urgent) then
+	if (not _atroxArenaViewerData.defaults.profile.uniquecolor or urgent) then
 	
 		if (data.class == "DEATHKNIGHT") then
 			return 0.77, 0.12, 0.23

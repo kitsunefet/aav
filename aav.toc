@@ -1,8 +1,8 @@
 ## Title: AAV - atrox Arena Viewer (Cata Classic)
 ## Author: zwacky (real OG), Skeledurr, Nookyx, tehfet
 ## Interface: 40400
-## Version: 1.4.19
-## SavedVariables: atroxArenaViewerData
+## Version: 1.4.20
+## SavedVariables: _atroxArenaViewerData, atroxArenaViewerData, AAV_DB
 ## Notes: record and view arena replays.
 
 lib\LibStub-1.0\LibStub-1.0.xml
@@ -16,6 +16,8 @@ lib\AceEvent-3.0\AceEvent-3.0.xml
 lib\AceComm-3.0\AceComm-3.0.xml
 lib\AceLocale-3.0\AceLocale-3.0.xml
 lib\AceSerializer-3.0\AceSerializer-3.0.xml
+lib\LibDeflate\lib.xml
+lib\LibSerialize\lib.xml
 
 lang\lang.en.lua
 lang\lang.cn.lua

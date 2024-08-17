@@ -79,17 +79,17 @@ function AAV_TableGui:showMatchesFrame()
 		AAV_TableGui:createMatchesTable()
 		self:generateSpecIconAndRoleTables()
 		matchesTable.frame:SetBackdropColor(0.1,0.1,0.1,0.9);
-		currentShowType = atroxArenaViewerData.current.showBySpec
+		currentShowType = _atroxArenaViewerData.current.showBySpec
 		local width, height = matchesTable.frame:GetSize()
 		matchesTable.frame:SetPoint("CENTER",0,-15)
 		matchesFrame:SetWidth(width)
 		matchesFrame:SetHeight(height + 30)
 	end
-	if(atroxArenaViewerData.data and atroxArenaViewerData.data[1] and matchesTable.data and matchesTable.data[1]) then
+	if(_atroxArenaViewerMatchData and _atroxArenaViewerMatchData[1] and matchesTable.data and matchesTable.data[1]) then
 		-- Quick check to see if the table needs to be updated: if the table has the most recent game then no update required
-		if (atroxArenaViewerData.current.showBySpec ~= currentShowType or atroxArenaViewerData.data[1]["startTime"] ~= matchesTable.data[1].cols[1]["value"]) then
+		if (_atroxArenaViewerData.current.showBySpec ~= currentShowType or _atroxArenaViewerMatchData[1]["startTime"] ~= matchesTable.data[1].cols[1]["value"]) then
 			self:fillMatchesTable()
-			currentShowType = atroxArenaViewerData.current.showBySpec
+			currentShowType = _atroxArenaViewerData.current.showBySpec
 		end			
 	else
 		self:fillMatchesTable()
@@ -175,7 +175,7 @@ function AAV_TableGui:createMatchesTable()
 		["OnClick"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, button, ...)
 			if (button == "RightButton") then
 				--self:hideMatchesFrame()
-			elseif (row and column and realrow and atroxArenaViewerData and atroxArenaViewerData.data and atroxArenaViewerData.data[realrow]) then
+			elseif (row and column and realrow and _atroxArenaViewerData and _atroxArenaViewerMatchData and _atroxArenaViewerMatchData[realrow]) then
 				if(column == #cols) then
 					atroxArenaViewer:deleteMatch(realrow)
 					self:showMatchesFrame()
@@ -187,8 +187,8 @@ function AAV_TableGui:createMatchesTable()
 			end
 		end,
 		["OnEnter"] = function (rowFrame, cellFrame, data, cols, row, realrow, column, scrollingTable, button, ...)
-			if (row and column and realrow and atroxArenaViewerData and atroxArenaViewerData.data and atroxArenaViewerData.data[realrow]) then
-				if (atroxArenaViewerData.defaults.profile.shownamestooltip) then
+			if (row and column and realrow and _atroxArenaViewerData and _atroxArenaViewerMatchData and _atroxArenaViewerMatchData[realrow]) then
+				if (_atroxArenaViewerData.defaults.profile.shownamestooltip) then
 					AAV_Gui:ShowTooltip(cellFrame, data[realrow]['team1'], data[realrow]['team2'], data[realrow]['lose'])
 				end
 			end
@@ -203,13 +203,13 @@ end
 -- Fills in the data in the matches results table. Called by showMatchesFrame().
 function AAV_TableGui:fillMatchesTable()	
 	local data = {}
-	if(atroxArenaViewerData.data and atroxArenaViewerData.data[1]) then
+	if(_atroxArenaViewerMatchData and _atroxArenaViewerMatchData[1]) then
 		local deleteColor  = { ["r"] = 1.0, ["g"] = 0.0, ["b"] = 0.0, ["a"] = 1.0 };
 		local unknownMatchColor = { ["r"] = 1.0, ["g"] = 0.00, ["b"] = 0.00, ["a"] = 1.0 };
 		local wonMatchColor = { ["r"] = 0.00, ["g"] = 1.00, ["b"] = 0.00, ["a"] = 1.0 };
 		local lostMatchColor = { ["r"] = 1.0, ["g"] = 0.00, ["b"] = 0.00, ["a"] = 1.0 };
 
-		for row = 1, #atroxArenaViewerData.data do
+		for row = 1, #_atroxArenaViewerMatchData do
 			if not data[row] then
 				data[row] = {};
 			end
@@ -293,10 +293,10 @@ end
 -- @param num The match number.
 function AAV_TableGui:determineMatchSummary(num)
 	local elapsedStr, mapname, matchResult, idSortStr, ownTeam, enemyTeam, ownTeamRating, ownTeamMMR, ownTeamRatingDiff, enemyTeamRating, enemyTeamMMR, enemyTeamRatingDiff
-	local teamdata = atroxArenaViewerData.data[num]["teams"]
-	local matchdata = atroxArenaViewerData.data[num]["combatans"]["dudes"]
-	local startTime = atroxArenaViewerData.data[num]["startTime"]
-	local elapsed = atroxArenaViewerData.data[num].elapsed
+	local teamdata = _atroxArenaViewerMatchData[num]["teams"]
+	local matchdata = _atroxArenaViewerMatchData[num]["combatans"]["dudes"]
+	local startTime = _atroxArenaViewerMatchData[num]["startTime"]
+	local elapsed = _atroxArenaViewerMatchData[num].elapsed
 	--local healersList = {a = true, b = true, c = true}
 
 	elapsedStr = string.format("%.2d:%.2d", math.floor(elapsed / 60), elapsed % 60)
@@ -315,26 +315,26 @@ function AAV_TableGui:determineMatchSummary(num)
 	end
 
 	-- set map name
-	if (type(atroxArenaViewerData.data[num]["map"])=="number") then
-		if (AAV_COMM_MAPS[atroxArenaViewerData.data[num]["map"]]) then
-			mapname = AAV_COMM_MAPS[atroxArenaViewerData.data[num]["map"]]
+	if (type(_atroxArenaViewerMatchData[num]["map"])=="number") then
+		if (AAV_COMM_MAPS[_atroxArenaViewerMatchData[num]["map"]]) then
+			mapname = AAV_COMM_MAPS[_atroxArenaViewerMatchData[num]["map"]]
 		else
 			mapname = "Unknown"
 		end
 	else
-		mapname = atroxArenaViewerData.data[num]["map"]
+		mapname = _atroxArenaViewerMatchData[num]["map"]
 	end
 
 	-- set match result
 	-- win or loss
-	if atroxArenaViewerData.data[num]["result"] == 0 then
+	if _atroxArenaViewerMatchData[num]["result"] == 0 then
 		matchResult = "UNKNOWN"
-	elseif atroxArenaViewerData.data[num]["result"] == 1 then
+	elseif _atroxArenaViewerMatchData[num]["result"] == 1 then
 		matchResult = "WIN"
-	elseif atroxArenaViewerData.data[num]["result"] == 2 then
+	elseif _atroxArenaViewerMatchData[num]["result"] == 2 then
 		matchResult = "LOSS"
 	else -- catch all, should not occur
-		matchResult = atroxArenaViewerData.data[num]["result"]
+		matchResult = _atroxArenaViewerMatchData[num]["result"]
 	end
 
 	-- set teamOne, teamTwo
@@ -360,14 +360,14 @@ function AAV_TableGui:determineMatchSummary(num)
 				end
 				if (team == 1) then
 					teamOne[idSortStr] = w
-					if (atroxArenaViewerData.defaults.profile.showplayerrealm and w.realm) then
+					if (_atroxArenaViewerData.defaults.profile.showplayerrealm and w.realm) then
 						table.insert(team1, w.name .. "-" .. w.realm)
 					else
 						table.insert(team1, w.name)
 					end
 				elseif (team == 2) then
 					teamTwo[idSortStr] = w
-					if (atroxArenaViewerData.defaults.profile.showplayerrealm and w.realm) then
+					if (_atroxArenaViewerData.defaults.profile.showplayerrealm and w.realm) then
 						table.insert(team2, w.name .. "-" .. w.realm)
 					else
 						table.insert(team2, w.name)
@@ -392,7 +392,7 @@ function AAV_TableGui:determineMatchSummary(num)
 			else
 				icon = specIconTable("UNKNOWN")
 			end
-			if (w.spec~="" and w.spec~="nospec" and atroxArenaViewerData.defaults.profile.showdetectedspec) then
+			if (w.spec~="" and w.spec~="nospec" and _atroxArenaViewerData.defaults.profile.showdetectedspec) then
 				icon = "\124T" .. "Interface\\Addons\\aav\\res\\spec\\" .. w.spec .. ":22\124t"
 			end
 			sortedNames = sortedNames .. " " .. icon

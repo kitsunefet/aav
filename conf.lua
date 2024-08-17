@@ -36,9 +36,9 @@ SlashCmdList["ATROXARENAVIEWER"] = function(msg)
 		self:changeRecording()
 		
 	elseif (msg == "play") then
-		if (atroxArenaViewerData.data) then
+		if (_atroxArenaViewerMatchData) then
 			print(L.CONF_DESCR_PLAY)
-			for k,v in pairs(atroxArenaViewerData.data) do
+			for k,v in pairs(_atroxArenaViewerMatchData) do
 				print("   " .. k .. " - " .. v.map .. " at " .. v.startTime)
 			end
 		else
@@ -46,23 +46,23 @@ SlashCmdList["ATROXARENAVIEWER"] = function(msg)
 		end
 	elseif (string.find(msg, 'play%s%d*')) then
 		local num = tonumber(string.sub(msg, 6))
-		if (num and atroxArenaViewerData.data[num]) then
+		if (num and _atroxArenaViewerMatchData[num]) then
 			self:createPlayer(num)
 			self:playMatch(num)
 		else
 			print(L.ERROR_WRONG_INPUT)
 		end
 	elseif (msg == "delete") then
-		if (atroxArenaViewerData.data) then
+		if (_atroxArenaViewerMatchData) then
 			print(L.CONF_DESCR_DELETE)
-			for k,v in pairs(atroxArenaViewerData.data) do
+			for k,v in pairs(_atroxArenaViewerMatchData) do
 				print("   " .. k .. " - " .. v.map .. " at " .. v.startTime)
 			end
 		else
 			print(L.NO_MATCHES_FOUND)
 		end]]--
 	elseif (msg == "delete all") then
-		numOfMatches = #atroxArenaViewerData.data
+		numOfMatches = #_atroxArenaViewerMatchData
 		for i = 1, numOfMatches do
 			parent:deleteMatch(1) 
 		end

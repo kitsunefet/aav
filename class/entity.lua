@@ -75,7 +75,7 @@ end
 function AAV_PlayerEntity:setValue(class, spec, name, maxhp, v)
 	self.data = v
 	self.icon.texture:SetTexture("Interface\\Addons\\aav\\res\\" .. class .. ".tga")
-	if (spec~="" and spec~="nospec" and atroxArenaViewerData.defaults.profile.showdetectedspec) then
+	if (spec~="" and spec~="nospec" and _atroxArenaViewerData.defaults.profile.showdetectedspec) then
 		self.icon.texture:SetTexture("Interface\\Addons\\aav\\res\\spec\\" .. spec .. ".tga")
 	end
 	self.name:SetText(name)
@@ -104,14 +104,14 @@ function AAV_PlayerEntity:setHealthBarText()
 	if (value == 0) then
 		txt = "Dead"
 	else
-		if (atroxArenaViewerData.defaults.profile.healthdisplay == 1) then
+		if (_atroxArenaViewerData.defaults.profile.healthdisplay == 1) then
 			local a = (value/max)*100*10
 			local i = string.find(a,"[\.]",1)
 			if (i) then a = tonumber(string.sub(a,1, string.find(a,"[\.]",1)-1)) end
 			txt = (a / 10) .. "%"
-		elseif (atroxArenaViewerData.defaults.profile.healthdisplay == 2) then
+		elseif (_atroxArenaViewerData.defaults.profile.healthdisplay == 2) then
 			txt = value .. " / " .. max
-		elseif (atroxArenaViewerData.defaults.profile.healthdisplay == 3) then
+		elseif (_atroxArenaViewerData.defaults.profile.healthdisplay == 3) then
 			txt = (value - max) .. " / " .. max
 		end
 	
@@ -179,7 +179,7 @@ function AAV_PlayerEntity:addAura(spellid, type, duration, stacks)
 	aura = AAV_Aura:new(range, spellid, type, #target, duration, stacks)
 	self:setAura(aura, spellid, type, duration, stacks)
 	
-	if (atroxArenaViewerData.defaults.profile.shortauras and #target > AAV_MAX_AURASVISIBLE) then
+	if (_atroxArenaViewerData.defaults.profile.shortauras and #target > AAV_MAX_AURASVISIBLE) then
 		for k,v in pairs(target) do
 			self:removeAura(v.spellid, type)
 			break
@@ -337,7 +337,7 @@ function AAV_PlayerEntity:setAura(aura, spellid, type, duration, stacks)
 	aura.frame:Show()
 	
 	table.insert(target, aura)
-	if (#target > AAV_MAX_AURASVISIBLE and atroxArenaViewerData.defaults.profile.shortauras) then
+	if (#target > AAV_MAX_AURASVISIBLE and _atroxArenaViewerData.defaults.profile.shortauras) then
 		for k,v in pairs(target) do
 			
 		end
