@@ -95,6 +95,7 @@ function AAV_MatchStub:setBracket()
 	-- 	print("teamTwoPlayerCount MatchStub: " .. teamTwoPlayerCount)
 	-- 	print("bracket MatchStub: " .. bracket)
 	-- end
+	return bracket
 end
 
 

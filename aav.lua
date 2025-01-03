@@ -39,7 +39,7 @@ local message = {
 -------------------------
 AAV_VERSIONMAJOR = 1
 AAV_VERSIONMINOR = 4
-AAV_VERSIONBUGFIX = 22
+AAV_VERSIONBUGFIX = 23
 AAV_UPDATESPEED = 60
 AAV_AURAFULLINDEXSTEP = 1
 AAV_INITOFFTIME = 0.5
@@ -747,6 +747,25 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 			local teamName0 = "own team"
 			local teamName1 = "enemy team"
 			local diff0 = newTeamRating0 - oldTeamRating0
+
+			-- get personal rating diff
+			local teamrating = 0
+			local teamratingdiff = 0
+			local brSize = M:setBracket()
+
+			if (brSize == 2) then
+				teamrating,_,_,_ = GetPersonalRatedInfo(1)
+				teamratingdiff = teamrating - self.rating2
+			end
+			if (brSize == 3) then
+				teamrating,_,_,_ = GetPersonalRatedInfo(2)
+				teamratingdiff = teamrating - self.rating3
+			end
+			if (brSize == 5) then
+				teamrating,_,_,_ = GetPersonalRatedInfo(3)
+				teamratingdiff = teamrating - self.rating5
+			end
+
 			local diff1 = newTeamRating1 - oldTeamRating1
 			local playerTeamColor = 'nocolor'
 			local isUnratedArena, isRatedArena = IsActiveBattlefieldArena() -- isUnratedArena needs to also check for not isRatedArena to be really sure its unrated arena
@@ -825,10 +844,10 @@ function atroxArenaViewer:UPDATE_BATTLEFIELD_STATUS(event, status)
 					-- enemy team is always set to id 1 for the same reason
 					if (faction == 0) then
 						-- team (id), name (team), rating, diff, mmr
-						M:setTeams(0, teamName0, oldTeamRating0, diff0, matchMakingRating0) -- we are in team 0
+						M:setTeams(0, teamName0, teamrating, teamratingdiff, matchMakingRating0) -- we are in team 0
 						M:setTeams(1, teamName1, oldTeamRating1, diff1, matchMakingRating1) -- enemy is in team 1
 					else -- switch it up
-						M:setTeams(0, teamName1, oldTeamRating1, diff1, matchMakingRating1) -- we are in team 1
+						M:setTeams(0, teamName1, teamrating, teamratingdiff, matchMakingRating1) -- we are in team 1
 						M:setTeams(1, teamName0, oldTeamRating0, diff0, matchMakingRating0) -- enemy is in team 0
 					end
 					
@@ -994,6 +1013,11 @@ function atroxArenaViewer:CHAT_MSG_BG_SYSTEM_NEUTRAL(event, msg)
 		end
 	elseif (msg == L.ARENA_15) then
 		currentstate = 7
+		
+		self.rating2,_,_,_ = GetPersonalRatedInfo(1) -- 2v2
+		self.rating3,_,_,_ = GetPersonalRatedInfo(2) -- 3v3
+		self.rating5,_,_,_ = GetPersonalRatedInfo(3) -- 5v5
+
 		if (_atroxArenaViewerData.current.broadcast) then
 			message["std"] = {
 				event = AAV_COMM_EVENT["cmd_status"],
@@ -1747,7 +1771,7 @@ end
 
 
 function atroxArenaViewer:getCurrentTime()
-	return date("%m/%d/%y %H:%M:%S")
+	return date("%y-%m-%d %H:%M:%S")
 end
 
 function atroxArenaViewer:getDiffTime()
