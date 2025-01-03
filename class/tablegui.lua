@@ -154,8 +154,8 @@ function AAV_TableGui:createMatchesTable()
 			["width"] = 50,
 		}, -- [5]
 		{
-			["name"] = "                        Team Compositions", -- matchup (class icons)
-			["width"] = 225,
+			["name"] = "                         Team Compositions", -- matchup (class icons)
+			["width"] = 235,
 		}, -- [6]
 		--{
 		--	["name"] = "Enemy Rating",
@@ -400,9 +400,12 @@ function AAV_TableGui:determineMatchSummary(num)
 		return sortedNames
 	end
 	local matchUp = sortNames(teamOne) .. "  vs  " .. sortNames(teamTwo)
-	local teamsize = #team1
-	for i = 1, 5-teamsize, 1 do
+	local team1size = #team1
+	local team2size = #team2
+	for i = 1, 5-team1size, 1 do
 		matchUp = "\124T" .. "Interface\\Addons\\aav\\res\\spec\\" .. "EMPTY_VAL" .. ":22\124t" .. matchUp
+	end
+	for i = 1, 5-team2size, 1 do
 		matchUp = matchUp .. "\124T" .. "Interface\\Addons\\aav\\res\\spec\\" .. "EMPTY_VAL" .. ":22\124t"
 	end
 	
