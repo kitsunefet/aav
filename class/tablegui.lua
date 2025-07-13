@@ -451,6 +451,7 @@ function AAV_TableGui:generateSpecIconAndRoleTables()
 		["WARLOCK"] = classIconPath .. "WARLOCK",
 		["WARRIOR"] = classIconPath .. "WARRIOR",
 		["DEATHKNIGHT"] = classIconPath .. "DEATHKNIGHT",
+		["MONK"] = classIconPath .. "MONK",
 		["UNKNOWN"] = classIconPath .. "UNKNOWN",
 	}
 
@@ -465,6 +466,7 @@ function AAV_TableGui:generateSpecIconAndRoleTables()
 		["WARLOCK"] = C_CreatureInfo.GetClassInfo(9).classFile,
 		["WARRIOR"] = C_CreatureInfo.GetClassInfo(1).classFile,
 		["DEATHKNIGHT"] = C_CreatureInfo.GetClassInfo(6).classFile,
+		["MONK"] = C_CreatureInfo.GetClassInfo(10).classFile,
 		["UNKNOWN"] = "UNKNOWN",
 	}
 
@@ -478,6 +480,7 @@ function AAV_TableGui:generateSpecIconAndRoleTables()
 	specIconTable[classNames["WARLOCK"]] = "\124T" .. classIcons["WARLOCK"] .. ":22\124t"
 	specIconTable[classNames["WARRIOR"]] = "\124T" .. classIcons["WARRIOR"] .. ":22\124t"
 	specIconTable[classNames["DEATHKNIGHT"]] = "\124T" .. classIcons["DEATHKNIGHT"] .. ":22\124t"
+	specIconTable[classNames["MONK"]] = "\124T" .. classIcons["MONK"] .. ":22\124t"
 	specIconTable[classNames["UNKNOWN"]] = "\124T" .. classIcons["UNKNOWN"] .. ":22\124t"
 end
 

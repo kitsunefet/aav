@@ -1,3 +1,5 @@
+local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
+
 AAV_UsedSkill = {}
 AAV_UsedSkill.__index = AAV_UsedSkill
 
@@ -24,7 +26,9 @@ function AAV_UsedSkill:setValue(parent, spellid, cast, num, v)
 	local name, _, icon, casttime, _, _, _, _ = GetSpellInfo(spellid)
 	--if (casttime>0) then print(casttime .. "-" .. name) end
 	if (name == nil) then
-		return
+		casttime = 1000
+		name = L.UNKNOWN
+		icon = "Interface\\Icons\\INV_Misc_QuestionMark"
 	end
 	-- pvp trinket icon override to alliance insignia
 	-- FOR THE ALLIANCE!

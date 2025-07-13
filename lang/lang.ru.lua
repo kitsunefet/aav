@@ -69,4 +69,4 @@ L.DETAIL_HEALDONE				= "Сделано\nисцеления"
 L.DETAIL_RATING					= "Рейтинг"
 L.DETAIL_MMR					= "MMR"
 
-L.ERROR_OLDMATCHES				= "You may encounter issues while playing older games (old SpellIds, etc.)!"
+L.ERROR_OLDMATCHES				= "У вас могут возникнуть проблемы при просмотре старых игр (старые SpellIds и т.д.)"

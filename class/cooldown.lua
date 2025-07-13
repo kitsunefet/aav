@@ -1,3 +1,5 @@
+local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
+
 AAV_Cooldown = {}
 AAV_Cooldown.__index = AAV_Cooldown
 
@@ -15,6 +17,10 @@ end
 
 function AAV_Cooldown:setValue(parent, spellid, duration, entity, entry)
 	local name, _, icon = GetSpellInfo(spellid)
+	if (name == nil) then
+		name = L.UNKNOWN
+		icon = "Interface\\Icons\\INV_Misc_QuestionMark"
+	end
 	-- pvp trinket icon override to alliance insignia
 	-- FOR THE ALLIANCE!
 	if spellid == 42292 then

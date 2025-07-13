@@ -1,3 +1,5 @@
+local L = LibStub("AceLocale-3.0"):GetLocale("atroxArenaViewer", true)
+
 AAV_PlayerEntity = {}
 AAV_PlayerEntity.__index = AAV_PlayerEntity
 
@@ -307,7 +309,10 @@ end
 function AAV_PlayerEntity:setAura(aura, spellid, type, duration, stacks)
 	local name, _, icon, _, _, _, _ = GetSpellInfo(spellid)
 	local target, parent
-
+	if (name == nil) then
+		name = L.UNKNOWN
+		icon = "Interface\\Icons\\INV_Misc_QuestionMark"
+	end
 	-- TODO: what do we do with duration and stacks here? currently nothing
 	-- if AAV_DEBUG_MODE then
 	-- 	print(spellid)

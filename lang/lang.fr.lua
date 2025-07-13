@@ -70,4 +70,4 @@ L.DETAIL_HEALDONE				= "Soins\nprodigués"
 L.DETAIL_RATING					= "Côte"
 L.DETAIL_MMR					= "MMR"
 
-L.ERROR_OLDMATCHES				= "You may encounter issues while playing older games (old SpellIds, etc.)!"
+L.ERROR_OLDMATCHES				= "Vous pouvez rencontrer des problèmes pour visualiser des jeux plus anciens (anciens SpellIds, etc.)"
